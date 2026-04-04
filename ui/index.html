@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whistle Postman</title>
+  <link rel="stylesheet" href="/ui/css/styles.css">
+  <link rel="stylesheet" href="/ui/lib/atom-one-dark.min.css">
+  <script src="/ui/lib/highlight.min.js"></script>
+  <script src="/ui/lib/json.min.js"></script>
+  <link rel="stylesheet" href="/ui/lib/codemirror.min.css">
+  <script src="/ui/lib/codemirror.min.js"></script>
+  <script src="/ui/lib/javascript.min.js"></script>
+  <script src="/ui/lib/matchbrackets.min.js"></script>
+  <script src="/ui/lib/closebrackets.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">Whistle Postman</h1>
+      </div>
+      <div class="header-right">
+        <select id="environment-select" class="env-select">
+          <option value="">No Environment</option>
+        </select>
+        <button id="settings-btn" class="icon-btn" title="Settings">⚙</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <button id="import-btn" class="sidebar-action-btn">
+            <span class="icon">↓</span> Import
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="section-header">
+            <span class="section-title">Recent</span>
+          </div>
+          <div id="recent-list" class="request-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="section-header">
+            <span class="section-title">Collections</span>
+            <button id="new-folder-btn" class="icon-btn-sm" title="New Folder">+</button>
+          </div>
+          <div id="new-folder-inline" class="new-folder-inline hidden">
+            <input id="new-folder-input" type="text" class="new-folder-input" placeholder="Folder name">
+            <button id="new-folder-confirm" class="new-folder-btn">✓</button>
+            <button id="new-folder-cancel" class="new-folder-btn">×</button>
+          </div>
+          <div id="collections-tree" class="request-list"></div>
+        </div>
+      </aside>
+
+      <main class="editor-area">
+        <div class="request-bar">
+          <select id="method-select" class="method-select">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+            <option value="HEAD">HEAD</option>
+            <option value="OPTIONS">OPTIONS</option>
+          </select>
+          <input id="url-input" type="text" class="url-input" placeholder="Enter request URL or paste cURL">
+          <button id="copy-curl-btn" class="copy-curl-btn" title="Copy as cURL">📋 cURL</button>
+          <button id="send-btn" class="send-btn">Send</button>
+        </div>
+
+        <div class="editor-tabs">
+          <button class="tab-btn active" data-tab="params">Params</button>
+          <button class="tab-btn" data-tab="headers">Headers</button>
+          <button class="tab-btn" data-tab="body">Body</button>
+          <button class="tab-btn" data-tab="auth">Auth</button>
+          <button class="tab-btn" data-tab="ai-mock">AI Mock</button>
+        </div>
+
+        <div class="tab-content active" id="tab-params">
+          <div class="kv-editor">
+            <div class="kv-header">
+              <span class="kv-key">Key</span>
+              <span class="kv-value">Value</span>
+              <span class="kv-actions"></span>
+            </div>
+            <div id="params-list" class="kv-list"></div>
+            <button class="add-row-btn" data-target="params">+ Add</button>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-headers">
+          <div class="kv-editor">
+            <div class="kv-header">
+              <span class="kv-key">Key</span>
+              <span class="kv-value">Value</span>
+              <span class="kv-actions"></span>
+            </div>
+            <div id="headers-list" class="kv-list"></div>
+            <button class="add-row-btn" data-target="headers">+ Add</button>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-body">
+          <div class="body-type-selector">
+            <select id="body-type-select" class="body-type-select">
+              <option value="none">none</option>
+              <option value="json">JSON</option>
+              <option value="form-data">form-data</option>
+              <option value="raw">raw</option>
+            </select>
+            <button id="format-json-btn" class="format-btn" title="Format JSON">{ }</button>
+          </div>
+          <div class="body-json-editor" id="body-json-editor">
+            <textarea id="body-editor-cm" class="body-editor-cm" placeholder="Request body"></textarea>
+          </div>
+          <textarea id="body-editor" class="body-editor-raw" placeholder="Request body (raw text)"></textarea>
+          <div id="body-form-data-editor" class="body-form-data-editor" style="display:none;">
+            <div class="kv-header">
+              <span class="kv-key">Key</span>
+              <span class="kv-value">Value</span>
+              <span class="kv-actions"></span>
+            </div>
+            <div id="body-form-data-list" class="kv-list"></div>
+            <button class="add-row-btn" data-target="body-form-data">+ Add</button>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-auth">
+          <div class="auth-type-selector">
+            <select id="auth-type-select" class="auth-type-select">
+              <option value="none">No Auth</option>
+              <option value="bearer">Bearer Token</option>
+              <option value="basic">Basic Auth</option>
+              <option value="apikey">API Key</option>
+            </select>
+          </div>
+          <div id="auth-config" class="auth-config"></div>
+        </div>
+
+        <div class="tab-content" id="tab-ai-mock">
+          <div class="ai-mock-panel">
+            <div class="ai-mock-header">
+              <h3>AI Mock Response</h3>
+              <button id="generate-mock-btn" class="primary-btn">Generate</button>
+            </div>
+            <div class="ai-mock-input">
+              <label>JSON Schema (optional):</label>
+              <div class="ai-codemirror-wrapper">
+                <textarea id="schema-input" class="schema-input" placeholder='{"type":"object","properties":{"id":{"type":"integer"},"name":{"type":"string"}}}'></textarea>
+              </div>
+            </div>
+            <div class="ai-mock-input ai-mock-prompt">
+              <label>Prompt (optional):</label>
+              <textarea id="prompt-input" class="prompt-input" placeholder="e.g. Generate 10 Chinese users with name, email, phone"></textarea>
+            </div>
+            <div class="ai-mock-output">
+              <div class="mock-output-header">
+                <span>Generated Response</span>
+                <button id="copy-mock-btn" class="icon-btn-sm">Copy</button>
+              </div>
+              <div class="ai-codemirror-wrapper mock-output-wrapper">
+                <textarea id="mock-output-cm" class="mock-output-cm"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="response-section">
+          <div class="response-resize-handle"></div>
+          <div class="response-header">
+            <span class="response-title">Response</span>
+            <div class="response-meta">
+              <span id="response-status" class="response-status"></span>
+              <span id="response-time" class="response-time"></span>
+              <span id="response-size" class="response-size"></span>
+              <button id="copy-response-btn" class="copy-response-btn" title="Copy Response">📋</button>
+            </div>
+          </div>
+          <div class="response-tabs">
+            <button class="tab-btn active" data-res-tab="body">Body</button>
+            <button class="tab-btn" data-res-tab="headers">Headers</button>
+            <button class="tab-btn" data-res-tab="cookies">Cookies</button>
+            <div class="response-search">
+              <input id="response-search-input" type="text" class="response-search-input" placeholder="Search...">
+              <span id="search-match-count" class="search-match-count"></span>
+              <button id="search-prev-btn" class="search-nav-btn" title="Previous (Shift+Enter)">↑</button>
+              <button id="search-next-btn" class="search-nav-btn" title="Next (Enter)">↓</button>
+            </div>
+          </div>
+          <div class="tab-content active" id="res-tab-body">
+            <pre id="response-body" class="response-body"></pre>
+          </div>
+          <div class="tab-content" id="res-tab-headers">
+            <pre id="response-headers" class="response-body"></pre>
+          </div>
+          <div class="tab-content" id="res-tab-cookies">
+            <pre id="response-cookies" class="response-body"></pre>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer class="app-footer">
+      <button id="save-btn" class="footer-btn">Save to Collection</button>
+      <button id="save-all-btn" class="footer-btn">Save All</button>
+      <span class="shortcut-hint">⌘S to save</span>
+    </footer>
+  </div>
+
+  <div id="import-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Import Request</h2>
+        <button class="close-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="import-input" class="import-input" placeholder="Paste cURL, HAR, or raw HTTP request..."></textarea>
+        <div class="format-detect">
+          <span>Detected: </span>
+          <span id="detected-format" class="format-badge">-</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="import-confirm-btn" class="primary-btn">Import</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="save-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Save to Collection</h2>
+        <button class="close-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Request Name:</label>
+          <input id="save-name-input" type="text" class="text-input" placeholder="My Request">
+        </div>
+        <div class="form-group">
+          <label>Folder:</label>
+          <div id="save-folder-dropdown" class="folder-dropdown">
+            <div id="save-folder-display" class="folder-display">
+              <span id="save-folder-display-text">Select a folder</span>
+              <span class="folder-dropdown-arrow">▼</span>
+            </div>
+            <div id="save-folder-list" class="folder-list hidden"></div>
+          </div>
+          <input type="hidden" id="save-folder-select" value="">
+        </div>
+        <div class="form-group">
+          <div id="save-new-folder-inline" class="new-folder-inline hidden">
+            <input id="save-new-folder-input" type="text" class="new-folder-input" placeholder="Folder name">
+            <button id="save-new-folder-confirm" class="new-folder-btn">✓</button>
+            <button id="save-new-folder-cancel" class="new-folder-btn">×</button>
+          </div>
+          <button id="new-folder-in-save" class="text-btn">+ New Folder</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="save-confirm-btn" class="primary-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="close-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>AI Provider:</label>
+          <select id="ai-provider-select" class="text-input">
+            <option value="openai">OpenAI</option>
+            <option value="custom">Custom Endpoint</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>API Endpoint:</label>
+          <input id="ai-endpoint-input" type="text" class="text-input" placeholder="https://api.openai.com/v1/chat/completions">
+        </div>
+        <div class="form-group">
+          <label>API Key:</label>
+          <input id="ai-apikey-input" type="password" class="text-input" placeholder="sk-...">
+        </div>
+        <div class="form-group">
+          <label>Model:</label>
+          <input id="ai-model-input" type="text" class="text-input" placeholder="gpt-4o-mini, deepseek-chat, etc.">
+        </div>
+        <div class="form-group">
+          <label>Environments:</label>
+          <div id="env-editor" class="env-editor"></div>
+          <button id="add-env-btn" class="text-btn">+ Add Environment</button>
+        </div>
+        <div class="form-group">
+          <label>Mock Templates:</label>
+          <div id="mock-templates-list" class="mock-templates-list"></div>
+          <button id="add-mock-template-btn" class="text-btn">+ Save Current Mock as Template</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="settings-save-btn" class="primary-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/ui/js/app.js"></script>
+</body>
+</html>

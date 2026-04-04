@@ -1,0 +1,22 @@
+{
+  "name": "whistle.postman",
+  "version": "1.0.0",
+  "description": "Postman-like HTTP request management plugin for Whistle",
+  "main": "index.js",
+  "keywords": ["whistle", "plugin", "http", "postman", "api", "debug", "curl", "mock"],
+  "author": "",
+  "license": "MIT",
+  "whistleConfig": {
+    "name": "Postman",
+    "tab": "/ui/index.html",
+    "comTab": "/ui/index.html"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
