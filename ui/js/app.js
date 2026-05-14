@@ -667,34 +667,46 @@
   function renderEnvEditor() {
     var container = $('#env-editor');
     container.innerHTML = '';
-    
+
     for (var name in state.environments) {
       var envItem = document.createElement('div');
       envItem.className = 'env-item';
-      envItem.innerHTML = 
+      envItem.innerHTML =
         '<input type="text" value="' + escapeHtml(name) + '" placeholder="Env name" class="env-name-input">' +
         '<input type="text" value="" placeholder="key=value, key2=value2" class="env-vars-input">' +
         '<button class="kv-delete">×</button>';
-      
+
       var vars = state.environments[name];
       var varsStr = [];
       for (var k in vars) {
         varsStr.push(k + '=' + vars[k]);
       }
       envItem.querySelector('.env-vars-input').value = varsStr.join(', ');
-      
+
+      envItem.querySelector('.kv-delete').addEventListener('click', function() {
+        container.removeChild(envItem);
+      });
+
       container.appendChild(envItem);
     }
   }
 
   function sendRequest() {
-    var req = state.currentRequest;
+    var req = JSON.parse(JSON.stringify(state.currentRequest));
     var envName = $('#environment-select').value;
-    
+
+    var filteredHeaders = {};
+    for (var key in (req.headers || {})) {
+      if (key.trim()) {
+        filteredHeaders[key] = req.headers[key];
+      }
+    }
+    req.headers = filteredHeaders;
+
     var sendBtn = $('#send-btn');
     sendBtn.innerHTML = '<span class="spinner"></span>';
     sendBtn.classList.add('loading');
-    
+
     api('/api/send', {
       method: 'POST',
       body: {
@@ -777,26 +789,28 @@
   function searchResponse(direction) {
     var query = $('#response-search-input').value;
     var container = $('#response-body');
+    var pre = container.querySelector('pre');
     var countEl = $('#search-match-count');
-    
+
     if (!query) {
       countEl.textContent = '';
       clearSearchHighlights();
       return;
     }
-    
-    var marks = container.querySelectorAll('mark');
-    
+
+    var marks = pre ? pre.querySelectorAll('mark') : [];
+
     if (marks.length === 0) {
       doSearchHighlight(query);
-      marks = container.querySelectorAll('mark');
+      pre = container.querySelector('pre');
+      marks = pre ? pre.querySelectorAll('mark') : [];
     }
-    
+
     if (marks.length === 0) {
       countEl.textContent = 'No matches';
       return;
     }
-    
+
     var currentIdx = -1;
     for (var i = 0; i < marks.length; i++) {
       if (marks[i].classList.contains('current-match')) {
@@ -805,7 +819,7 @@
         break;
       }
     }
-    
+
     var nextIdx;
     if (currentIdx === -1) {
       nextIdx = direction === 'prev' ? marks.length - 1 : 0;
@@ -814,29 +828,35 @@
         ? (currentIdx - 1 + marks.length) % marks.length
         : (currentIdx + 1) % marks.length;
     }
-    
+
     marks[nextIdx].classList.add('current-match');
     marks[nextIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
+
     countEl.textContent = (nextIdx + 1) + '/' + marks.length;
   }
 
   function doSearchHighlight(query) {
     var container = $('#response-body');
+    var pre = container.querySelector('pre');
+    if (!pre) return;
+
     clearSearchHighlights();
-    
-    var text = container.textContent || '';
+
+    var text = pre.textContent || '';
     var regex = new RegExp(escapeRegex(query), 'gi');
     var html = text.replace(regex, function(match) {
       return '<mark>' + match + '</mark>';
     });
-    
-    container.innerHTML = html;
+
+    pre.innerHTML = html;
   }
 
   function clearSearchHighlights() {
     var container = $('#response-body');
-    var marks = container.querySelectorAll('mark');
+    var pre = container.querySelector('pre');
+    if (!pre) return;
+
+    var marks = pre.querySelectorAll('mark');
     marks.forEach(function(m) {
       var parent = m.parentNode;
       parent.replaceChild(document.createTextNode(m.textContent), m);
@@ -1081,15 +1101,15 @@
   }
 
   function saveCurrentMockAsTemplate() {
-    var mockContent = $('#mock-output').textContent;
+    var mockContent = mockOutputCm ? mockOutputCm.getValue().trim() : '';
     if (!mockContent) {
       alert('No mock generated yet');
       return;
     }
-    
+
     var name = prompt('Enter template name:');
     if (!name) return;
-    
+
     try {
       var mock = JSON.parse(mockContent);
       api('/api/mock-templates', {
@@ -1104,7 +1124,10 @@
   }
 
   function applyMockTemplate(tpl) {
-    $('#mock-output').textContent = formatJson(JSON.stringify(tpl.mock));
+    if (mockOutputCm) {
+      mockOutputCm.setValue(formatJson(JSON.stringify(tpl.mock)));
+      mockOutputCm.refresh();
+    }
   }
 
   function batchSaveRequests() {
@@ -1324,6 +1347,20 @@
     $('#settings-save-btn').addEventListener('click', function() {
       saveConfig();
       saveEnvironments();
+    });
+
+    $('#add-env-btn').addEventListener('click', function() {
+      var container = $('#env-editor');
+      var envItem = document.createElement('div');
+      envItem.className = 'env-item';
+      envItem.innerHTML =
+        '<input type="text" value="" placeholder="Env name" class="env-name-input">' +
+        '<input type="text" value="" placeholder="key=value, key2=value2" class="env-vars-input">' +
+        '<button class="kv-delete">×</button>';
+      envItem.querySelector('.kv-delete').addEventListener('click', function() {
+        container.removeChild(envItem);
+      });
+      container.appendChild(envItem);
     });
 
     $('#add-mock-template-btn').addEventListener('click', saveCurrentMockAsTemplate);
