@@ -948,6 +948,21 @@ body {
   min-height: 0;
 }
 
+.response-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 100px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+
+.response-status.loading {
+  color: var(--accent);
+}
+
 .response-header {
   display: flex;
   justify-content: space-between;

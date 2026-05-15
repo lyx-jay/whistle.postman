@@ -753,6 +753,12 @@
     sendBtn.innerHTML = '<span class="spinner"></span>';
     sendBtn.classList.add('loading');
 
+    $('#response-status').textContent = 'Sending...';
+    $('#response-status').className = 'response-status';
+    $('#response-body').innerHTML = '<div class="response-loading">Sending request...</div>';
+    $('#response-time').textContent = '';
+    $('#response-size').textContent = '';
+
     api('/api/send', {
       method: 'POST',
       body: {
@@ -820,24 +826,33 @@
   function renderResponse() {
     var res = state.response;
     if (!res) return;
-    
+
     if (res.error) {
       $('#response-status').textContent = 'Error';
       $('#response-status').className = 'response-status error';
       $('#response-body').textContent = res.error;
       $('#response-time').textContent = '';
       $('#response-size').textContent = '';
+      scrollResponseIntoView();
       return;
     }
-    
+
     $('#response-status').textContent = (res.status || 200) + ' ' + (res.statusText || 'OK');
     $('#response-status').className = 'response-status ' + ((res.status || 200) >= 400 ? 'error' : '');
     $('#response-time').textContent = (res.time || 0) + 'ms';
     $('#response-size').textContent = formatSize(res.size || 0);
-    
+
     renderResponseBody(res.body || '');
     $('#response-headers').textContent = res.headers ? JSON.stringify(res.headers, null, 2) : '';
     $('#response-cookies').textContent = res.cookies ? JSON.stringify(res.cookies, null, 2) : '';
+    scrollResponseIntoView();
+  }
+
+  function scrollResponseIntoView() {
+    var responseSection = document.querySelector('.response-section');
+    if (responseSection) {
+      responseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function renderResponseBody(body) {
