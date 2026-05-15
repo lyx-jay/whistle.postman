@@ -905,13 +905,10 @@
       return;
     }
 
+    // Always re-highlight to handle query changes
+    doSearchHighlight(query);
+    pre = container.querySelector('pre');
     var marks = pre ? pre.querySelectorAll('mark') : [];
-
-    if (marks.length === 0) {
-      doSearchHighlight(query);
-      pre = container.querySelector('pre');
-      marks = pre ? pre.querySelectorAll('mark') : [];
-    }
 
     if (marks.length === 0) {
       countEl.textContent = 'No matches';
