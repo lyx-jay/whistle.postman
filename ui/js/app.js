@@ -5,6 +5,7 @@
   var bodyEditorCm = null;
   var schemaEditorCm = null;
   var mockOutputCm = null;
+  var scriptEditors = { preScript: null, tests: null };
   
   var state = {
     currentRequest: {
@@ -1433,6 +1434,12 @@
             if (mockOutputCm) mockOutputCm.refresh();
           }, 50);
         }
+        if (tab === 'pre-script' || tab === 'tests') {
+          setTimeout(function() {
+            if (scriptEditors.preScript) scriptEditors.preScript.refresh();
+            if (scriptEditors.tests) scriptEditors.tests.refresh();
+          }, 50);
+        }
       });
     });
 
@@ -1445,6 +1452,21 @@
         
         this.classList.add('active');
         $('#res-tab-' + tab).classList.add('active');
+      });
+    });
+
+    $$('.snippet-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var snippet = this.dataset.snippet;
+        var activeTab = document.querySelector('.tab-btn[data-tab].active');
+        if (activeTab) {
+          var tab = activeTab.dataset.tab;
+          if (tab === 'pre-script' && scriptEditors.preScript) {
+            scriptEditors.preScript.replaceSelection(snippet);
+          } else if (tab === 'tests' && scriptEditors.tests) {
+            scriptEditors.tests.replaceSelection(snippet);
+          }
+        }
       });
     });
 
@@ -1530,9 +1552,41 @@
     }, 100);
   }
 
+  function initScriptEditors() {
+    if (!scriptEditors.preScript) {
+      scriptEditors.preScript = CodeMirror.fromTextArea($('#pre-script-editor'), {
+        mode: { name: 'javascript' },
+        theme: 'atom-one-dark',
+        lineNumbers: true,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        indentUnit: 2,
+        tabSize: 2,
+        lineWrapping: true
+      });
+    }
+    if (!scriptEditors.tests) {
+      scriptEditors.tests = CodeMirror.fromTextArea($('#tests-editor'), {
+        mode: { name: 'javascript' },
+        theme: 'atom-one-dark',
+        lineNumbers: true,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        indentUnit: 2,
+        tabSize: 2,
+        lineWrapping: true
+      });
+    }
+    setTimeout(function() {
+      if (scriptEditors.preScript) scriptEditors.preScript.refresh();
+      if (scriptEditors.tests) scriptEditors.tests.refresh();
+    }, 100);
+  }
+
   function init() {
     initEventListeners();
     initAiMockEditors();
+    initScriptEditors();
     loadHistory();
     loadCollections();
     loadEnvironments();

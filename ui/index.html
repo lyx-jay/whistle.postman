@@ -79,6 +79,8 @@
           <button class="tab-btn" data-tab="body">Body</button>
           <button class="tab-btn" data-tab="auth">Auth</button>
           <button class="tab-btn" data-tab="ai-mock">AI Mock</button>
+          <button class="tab-btn" data-tab="pre-script">Pre-script</button>
+          <button class="tab-btn" data-tab="tests">Tests</button>
         </div>
 
         <div class="tab-content active" id="tab-params">
@@ -167,6 +169,47 @@
                 <textarea id="mock-output-cm" class="mock-output-cm"></textarea>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-pre-script">
+          <div class="script-editor-panel">
+            <div class="script-editor-header">
+              <h3>Pre-request Script</h3>
+              <span class="script-hint">Runs before the request is sent. Use pm.* to modify request.</span>
+            </div>
+            <div class="script-editor-wrapper">
+              <textarea id="pre-script-editor" class="script-editor"></textarea>
+            </div>
+            <div class="script-reference">
+              <h4>Quick Reference</h4>
+              <div class="script-snippets">
+                <button class="snippet-btn" data-snippet="pm.variables.set('key', 'value')">Set Variable</button>
+                <button class="snippet-btn" data-snippet="pm.request.headers['Authorization'] = 'Bearer ' + pm.variables.get('token')">Set Auth Header</button>
+                <button class="snippet-btn" data-snippet="pm.environment.get('baseUrl')">Get Env Var</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-tests">
+          <div class="script-editor-panel">
+            <div class="script-editor-header">
+              <h3>Tests</h3>
+              <span class="script-hint">Runs after response. Use pm.test() and pm.expect() to validate.</span>
+            </div>
+            <div class="script-editor-wrapper">
+              <textarea id="tests-editor" class="script-editor"></textarea>
+            </div>
+            <div class="script-reference">
+              <h4>Quick Reference</h4>
+              <div class="script-snippets">
+                <button class="snippet-btn" data-snippet="pm.test('Status is 200', function() {&#10;  pm.expect(pm.response.status).toBe(200);&#10;});">Test Status</button>
+                <button class="snippet-btn" data-snippet="pm.test('Has id field', function() {&#10;  var body = pm.response.json();&#10;  pm.expect(body).toHaveProperty('id');&#10;});">Test JSON Field</button>
+                <button class="snippet-btn" data-snippet="pm.test('Response time < 2000ms', function() {&#10;  pm.expect(pm.response.responseTime).toBeLessThan(2000);&#10;});">Test Response Time</button>
+              </div>
+            </div>
+            <div id="test-results" class="test-results hidden"></div>
           </div>
         </div>
 
