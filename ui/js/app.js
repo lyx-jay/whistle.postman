@@ -1797,11 +1797,33 @@
     }
   }
 
+  function handleUrlParams() {
+    var params = new URLSearchParams(window.location.search);
+
+    if (params.has('url')) {
+      state.currentRequest.url = params.get('url');
+    }
+    if (params.has('method')) {
+      state.currentRequest.method = params.get('method');
+    }
+    if (params.has('headers')) {
+      try {
+        state.currentRequest.headers = JSON.parse(params.get('headers'));
+      } catch (e) {}
+    }
+    if (params.has('body')) {
+      state.currentRequest.body = { type: 'raw', content: params.get('body') };
+    }
+
+    renderCurrentRequest();
+  }
+
   function init() {
     initEventListeners();
     initAiMockEditors();
     initScriptEditors();
     initRulesEditor();
+    handleUrlParams();
     loadHistory();
     loadCollections();
     loadEnvironments();
