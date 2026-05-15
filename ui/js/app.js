@@ -949,11 +949,40 @@
 
     clearSearchHighlights();
 
+    // Get plain text by temporarily removing syntax highlighting
     var text = pre.textContent || '';
+
+    // Store original HTML for restoration
+    if (!pre._originalHtml) {
+      pre._originalHtml = pre.innerHTML;
+    }
+
     var regex = new RegExp(escapeRegex(query), 'gi');
-    var html = text.replace(regex, function(match) {
-      return '<mark>' + match + '</mark>';
-    });
+    var matches = text.match(regex);
+
+    if (!matches || matches.length === 0) {
+      // Restore original HTML if no matches
+      if (pre._originalHtml) {
+        pre.innerHTML = pre._originalHtml;
+      }
+      return;
+    }
+
+    // Build new HTML with highlights
+    var lastIndex = 0;
+    var html = '';
+    var match;
+
+    regex.lastIndex = 0;
+    while ((match = regex.exec(text)) !== null) {
+      // Add text before match
+      html += escapeHtml(text.substring(lastIndex, match.index));
+      // Add highlighted match
+      html += '<mark>' + escapeHtml(match[0]) + '</mark>';
+      lastIndex = regex.lastIndex;
+    }
+    // Add remaining text
+    html += escapeHtml(text.substring(lastIndex));
 
     pre.innerHTML = html;
   }
@@ -962,6 +991,13 @@
     var container = $('#response-body');
     var pre = container.querySelector('pre');
     if (!pre) return;
+
+    // Restore original HTML if available
+    if (pre._originalHtml) {
+      pre.innerHTML = pre._originalHtml;
+      delete pre._originalHtml;
+      return;
+    }
 
     var marks = pre.querySelectorAll('mark');
     marks.forEach(function(m) {
