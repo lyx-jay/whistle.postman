@@ -1864,10 +1864,10 @@
   }
 
   function init() {
-    initEventListeners();
-    initAiMockEditors();
     initScriptEditors();
+    initAiMockEditors();
     initRulesEditor();
+    initEventListeners();
     handleUrlParams();
     loadHistory();
     loadCollections();

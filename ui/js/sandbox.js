@@ -186,7 +186,7 @@
         statusText: resp.statusText || '',
         headers: headersObj,
         body: body,
-        responseTime: resp.responseTime || 0,
+        responseTime: resp.responseTime || resp.time || 0,
         json: function() {
           try { return JSON.parse(body); }
           catch (e) { throw new Error('Response body is not valid JSON'); }
