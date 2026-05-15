@@ -23,7 +23,8 @@
     collections: { folders: [], requests: [] },
     config: {},
     history: [],
-    response: null
+    response: null,
+    testResults: []
   };
 
   var $ = function(selector) {
@@ -716,6 +717,8 @@
   function sendRequest() {
     var req = JSON.parse(JSON.stringify(state.currentRequest));
     var envName = $('#environment-select').value;
+    var envs = state.environments || {};
+    var envVars = envs[envName] || {};
 
     var filteredHeaders = {};
     for (var key in (req.headers || {})) {
@@ -724,6 +727,26 @@
       }
     }
     req.headers = filteredHeaders;
+
+    var preScript = scriptEditors.preScript ? scriptEditors.preScript.getValue() : '';
+    if (preScript.trim()) {
+      var preResult = Sandbox.execute('pre-req', preScript, {
+        request: req,
+        variables: envVars,
+        environment: envVars
+      });
+
+      if (!preResult.success) {
+        state.response = { error: 'Pre-script error: ' + preResult.error };
+        state.testResults = [];
+        renderResponse();
+        renderTestResults();
+        return;
+      }
+
+      req = preResult.modifiedRequest;
+      envVars = preResult.variables;
+    }
 
     var sendBtn = $('#send-btn');
     sendBtn.innerHTML = '<span class="spinner"></span>';
@@ -737,14 +760,56 @@
       }
     }).then(function(data) {
       state.response = data;
+
+      var testsScript = scriptEditors.tests ? scriptEditors.tests.getValue() : '';
+      if (testsScript.trim() && data.result === 'ok') {
+        var testResult = Sandbox.execute('test', testsScript, {
+          response: data,
+          variables: envVars
+        });
+        state.testResults = testResult.results;
+      } else {
+        state.testResults = [];
+      }
+
       renderResponse();
+      renderTestResults();
     }).catch(function(err) {
       state.response = { error: err.message };
+      state.testResults = [];
       renderResponse();
+      renderTestResults();
     }).finally(function() {
       sendBtn.innerHTML = 'Send';
       sendBtn.classList.remove('loading');
     });
+  }
+
+  function renderTestResults() {
+    var container = $('#test-results');
+    if (!container) return;
+
+    if (!state.testResults || state.testResults.length === 0) {
+      container.classList.add('hidden');
+      return;
+    }
+
+    container.classList.remove('hidden');
+    var html = '<h4>Test Results</h4>';
+
+    state.testResults.forEach(function(result) {
+      var icon = result.passed ? '✅' : '❌';
+      var cls = result.passed ? 'passed' : 'failed';
+      html += '<div class="test-result-item ' + cls + '">';
+      html += '<span class="test-result-icon">' + icon + '</span>';
+      html += '<span>' + escapeHtml(result.name) + '</span>';
+      if (result.error) {
+        html += '<span class="test-error"> - ' + escapeHtml(result.error) + '</span>';
+      }
+      html += '</div>';
+    });
+
+    container.innerHTML = html;
   }
 
   function renderResponse() {
