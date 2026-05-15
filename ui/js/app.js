@@ -729,7 +729,7 @@
     req.headers = filteredHeaders;
 
     var preScript = scriptEditors.preScript ? scriptEditors.preScript.getValue() : '';
-    if (preScript.trim()) {
+    if (preScript.trim() && typeof Sandbox !== 'undefined') {
       var preResult = Sandbox.execute('pre-req', preScript, {
         request: req,
         variables: envVars,
@@ -762,12 +762,16 @@
       state.response = data;
 
       var testsScript = scriptEditors.tests ? scriptEditors.tests.getValue() : '';
-      if (testsScript.trim() && data.result === 'ok') {
-        var testResult = Sandbox.execute('test', testsScript, {
-          response: data,
-          variables: envVars
-        });
-        state.testResults = testResult.results;
+      if (testsScript.trim() && typeof Sandbox !== 'undefined') {
+        try {
+          var testResult = Sandbox.execute('test', testsScript, {
+            response: data,
+            variables: envVars
+          });
+          state.testResults = testResult.results;
+        } catch (e) {
+          state.testResults = [{ name: 'Script Error', passed: false, error: e.message }];
+        }
       } else {
         state.testResults = [];
       }
