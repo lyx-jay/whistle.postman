@@ -959,6 +959,39 @@
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
+  function mockThisUrl() {
+    var req = state.currentRequest;
+    var res = state.response;
+
+    if (!req.url || !res || res.error) {
+      alert('No valid response to mock');
+      return;
+    }
+
+    var urlPath = req.url.replace(/^https?:\/\/[^\/]+/, '');
+    var host = req.url.match(/^https?:\/\/([^\/]+)/);
+    var pattern = host ? host[1] + urlPath : urlPath;
+
+    var mockBody = res.body || '{"message": "mock"}';
+    var rule = pattern + ' resBody://`' + mockBody + '`';
+
+    var ruleName = prompt('Rule name (for reference):', 'Mock ' + req.method + ' ' + urlPath);
+    if (!ruleName) return;
+
+    api('/api/rules', {
+      method: 'POST',
+      body: {
+        rules: rule,
+        values: {},
+        name: ruleName
+      }
+    }).then(function(data) {
+      alert('Mock rule created! The URL will now return mock data.');
+    }).catch(function(err) {
+      alert('Error creating rule: ' + err.message);
+    });
+  }
+
   function copyAsCurl() {
     var req = state.currentRequest;
     var parts = ['curl'];
@@ -1324,6 +1357,8 @@
     $('#copy-curl-btn').addEventListener('click', copyAsCurl);
 
     $('#copy-response-btn').addEventListener('click', copyResponse);
+
+    $('#mock-this-btn').addEventListener('click', mockThisUrl);
 
     var searchInput = $('#response-search-input');
     var searchTimeout;
