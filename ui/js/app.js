@@ -14,7 +14,9 @@
       headers: {},
       params: {},
       body: { type: 'none', content: '' },
-      auth: { type: 'none' }
+      auth: { type: 'none' },
+      preScript: '',
+      tests: ''
     },
     environments: {},
     currentEnv: '',
@@ -404,9 +406,13 @@
       headers: {},
       params: {},
       body: { type: 'none', content: '' },
-      auth: { type: 'none' }
+      auth: { type: 'none' },
+      preScript: '',
+      tests: ''
     };
     renderCurrentRequest();
+    if (scriptEditors.preScript) scriptEditors.preScript.setValue('');
+    if (scriptEditors.tests) scriptEditors.tests.setValue('');
     $$('.tab-btn[data-tab]').forEach(function(b) { b.classList.remove('active'); });
     $$('.tab-content[id^="tab-"]').forEach(function(c) { c.classList.remove('active'); });
     var paramsBtn = document.querySelector('.tab-btn[data-tab="params"]');
@@ -515,18 +521,18 @@
 
   function renderCurrentRequest() {
     var req = state.currentRequest;
-    
+
     $('#method-select').value = req.method;
     $('#url-input').value = req.url;
-    
+
     renderKvList('params-list', req.params || {}, function() {
       updateRequestFromUI();
     });
-    
+
     renderKvList('headers-list', req.headers || {}, function() {
       updateRequestFromUI();
     });
-    
+
     $('#body-type-select').value = req.body ? req.body.type : 'none';
     renderBodyEditor();
     var content = req.body ? req.body.content : '';
@@ -534,9 +540,18 @@
       bodyEditorCm.setValue(content);
       bodyEditorCm.refresh();
     }
-    
+
     $('#auth-type-select').value = req.auth ? req.auth.type : 'none';
     renderAuthConfig();
+
+    if (scriptEditors.preScript) {
+      scriptEditors.preScript.setValue(req.preScript || '');
+      scriptEditors.preScript.refresh();
+    }
+    if (scriptEditors.tests) {
+      scriptEditors.tests.setValue(req.tests || '');
+      scriptEditors.tests.refresh();
+    }
   }
 
   function renderBodyEditor() {
@@ -612,6 +627,12 @@
     state.currentRequest.auth = {
       type: $('#auth-type-select').value
     };
+    if (scriptEditors.preScript) {
+      state.currentRequest.preScript = scriptEditors.preScript.getValue();
+    }
+    if (scriptEditors.tests) {
+      state.currentRequest.tests = scriptEditors.tests.getValue();
+    }
   }
 
   function renderAuthConfig() {
