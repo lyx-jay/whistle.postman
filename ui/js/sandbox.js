@@ -188,7 +188,8 @@
         body: body,
         responseTime: resp.responseTime || 0,
         json: function() {
-          return JSON.parse(body);
+          try { return JSON.parse(body); }
+          catch (e) { throw new Error('Response body is not valid JSON'); }
         },
         text: function() {
           return typeof body === 'string' ? body : JSON.stringify(body);
