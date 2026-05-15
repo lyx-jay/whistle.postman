@@ -1358,3 +1358,63 @@ body {
 .test-result-item.passed { color: #49cc18; }
 .test-result-item.failed { color: #f93e3e; }
 .test-result-icon { font-size: 14px; }
+
+.rules-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.rules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+.rules-header h3 {
+  margin: 0;
+  font-size: 14px;
+}
+.rules-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  flex-wrap: wrap;
+}
+.rule-action-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.rule-action-btn:hover {
+  background: var(--bg-hover);
+}
+.rules-output {
+  flex: 1;
+  min-height: 150px;
+}
+.rules-editor {
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+}
+.rules-apply {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+}
+.secondary-btn {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.secondary-btn:hover {
+  background: var(--bg-hover);
+}

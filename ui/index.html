@@ -81,6 +81,7 @@
           <button class="tab-btn" data-tab="ai-mock">AI Mock</button>
           <button class="tab-btn" data-tab="pre-script">Pre-script</button>
           <button class="tab-btn" data-tab="tests">Tests</button>
+          <button class="tab-btn" data-tab="rules">Rules</button>
         </div>
 
         <div class="tab-content active" id="tab-params">
@@ -210,6 +211,28 @@
               </div>
             </div>
             <div id="test-results" class="test-results hidden"></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-rules">
+          <div class="rules-panel">
+            <div class="rules-header">
+              <h3>Generate Whistle Rules</h3>
+              <button id="copy-rules-btn" class="icon-btn-sm">Copy</button>
+            </div>
+            <div class="rules-actions">
+              <button class="rule-action-btn" data-rule-type="mock">Mock Response</button>
+              <button class="rule-action-btn" data-rule-type="redirect">Redirect</button>
+              <button class="rule-action-btn" data-rule-type="delay">Add Delay</button>
+              <button class="rule-action-btn" data-rule-type="throttle">Throttle</button>
+            </div>
+            <div class="rules-output">
+              <textarea id="rules-output-editor" class="rules-editor"></textarea>
+            </div>
+            <div class="rules-apply">
+              <button id="apply-rules-btn" class="primary-btn">Apply Rules</button>
+              <button id="clear-rules-btn" class="secondary-btn">Clear Rules</button>
+            </div>
           </div>
         </div>
 

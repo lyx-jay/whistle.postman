@@ -5,6 +5,7 @@
   var bodyEditorCm = null;
   var schemaEditorCm = null;
   var mockOutputCm = null;
+  var rulesEditor = null;
   var scriptEditors = { preScript: null, tests: null };
   
   var state = {
@@ -1565,6 +1566,11 @@
             if (scriptEditors.tests) scriptEditors.tests.refresh();
           }, 50);
         }
+        if (tab === 'rules') {
+          setTimeout(function() {
+            if (rulesEditor) rulesEditor.refresh();
+          }, 50);
+        }
       });
     });
 
@@ -1602,6 +1608,39 @@
         data[''] = '';
         renderKvList(target + '-list', data, updateRequestFromUI);
       });
+    });
+
+    $$('.rule-action-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        generateRule(this.dataset.ruleType);
+      });
+    });
+
+    $('#apply-rules-btn').addEventListener('click', function() {
+      var rules = rulesEditor ? rulesEditor.getValue() : '';
+      if (!rules.trim()) {
+        alert('No rules to apply');
+        return;
+      }
+
+      api('/api/rules', {
+        method: 'POST',
+        body: { rules: rules }
+      }).then(function() {
+        alert('Rules applied successfully!');
+      });
+    });
+
+    $('#clear-rules-btn').addEventListener('click', function() {
+      api('/api/rules', { method: 'DELETE' }).then(function() {
+        if (rulesEditor) rulesEditor.setValue('');
+        alert('Rules cleared');
+      });
+    });
+
+    $('#copy-rules-btn').addEventListener('click', function() {
+      var rules = rulesEditor ? rulesEditor.getValue() : '';
+      if (rules) navigator.clipboard.writeText(rules);
     });
 
     document.addEventListener('keydown', function(e) {
@@ -1708,10 +1747,61 @@
     }, 100);
   }
 
+  function initRulesEditor() {
+    if (!rulesEditor) {
+      rulesEditor = CodeMirror.fromTextArea($('#rules-output-editor'), {
+        mode: { name: 'javascript' },
+        theme: 'atom-one-dark',
+        lineNumbers: true,
+        lineWrapping: true
+      });
+    }
+    setTimeout(function() {
+      if (rulesEditor) rulesEditor.refresh();
+    }, 100);
+  }
+
+  function generateRule(type) {
+    var req = state.currentRequest;
+    if (!req.url) {
+      alert('Please enter a URL first');
+      return;
+    }
+
+    var urlPath = req.url.replace(/^https?:\/\/[^\/]+/, '');
+    var host = req.url.match(/^https?:\/\/([^\/]+)/);
+    var pattern = host ? host[1] + urlPath : urlPath;
+    var rule = '';
+
+    switch (type) {
+      case 'mock':
+        var body = state.response && state.response.body ? state.response.body : '{"message": "mock response"}';
+        rule = pattern + ' resBody://`' + body + '`';
+        break;
+      case 'redirect':
+        var target = prompt('Redirect to URL:', 'http://localhost:3000' + urlPath);
+        if (target) rule = pattern + ' ' + target;
+        break;
+      case 'delay':
+        var ms = prompt('Delay in milliseconds:', '2000');
+        if (ms) rule = pattern + ' resDelay://' + ms;
+        break;
+      case 'throttle':
+        var speed = prompt('Speed in KB/s:', '100');
+        if (speed) rule = pattern + ' resSpeed://' + speed;
+        break;
+    }
+
+    if (rule && rulesEditor) {
+      rulesEditor.setValue(rule);
+    }
+  }
+
   function init() {
     initEventListeners();
     initAiMockEditors();
     initScriptEditors();
+    initRulesEditor();
     loadHistory();
     loadCollections();
     loadEnvironments();
