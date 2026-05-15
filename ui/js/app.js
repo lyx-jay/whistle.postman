@@ -1030,6 +1030,49 @@
     });
   }
 
+  function generateTestsViaAI() {
+    var res = state.response;
+    if (!res || res.error) {
+      alert('No valid response to generate tests from. Send a request first.');
+      return;
+    }
+
+    var config = state.config || {};
+    if (!config.aiApiKey) {
+      alert('Please configure AI API key in Settings first.');
+      return;
+    }
+
+    var prompt = 'Generate JavaScript test assertions for this HTTP response. Use pm.test() and pm.expect() syntax. Generate 3-5 tests covering status code, response structure, and data types. Response status: ' + res.status + ', body preview: ' + (res.body || '').substring(0, 500);
+
+    var btn = $('#ai-generate-tests-btn');
+    btn.textContent = '⏳ Generating...';
+    btn.disabled = true;
+
+    api('/api/ai-mock', {
+      method: 'POST',
+      body: {
+        request: state.currentRequest,
+        prompt: prompt,
+        schema: null
+      }
+    }).then(function(data) {
+      if (data.mock && scriptEditors.tests) {
+        var tests = typeof data.mock === 'string' ? data.mock : JSON.stringify(data.mock, null, 2);
+        var codeMatch = tests.match(/```(?:javascript|js)?\n([\s\S]*?)```/);
+        if (codeMatch) {
+          tests = codeMatch[1];
+        }
+        scriptEditors.tests.setValue(tests);
+      }
+    }).catch(function(err) {
+      alert('AI generation failed: ' + err.message);
+    }).finally(function() {
+      btn.textContent = '🤖 AI Generate';
+      btn.disabled = false;
+    });
+  }
+
   function generateMock() {
     var schema = null;
     if (schemaEditorCm) {
@@ -1384,6 +1427,8 @@
     $('#search-next-btn').addEventListener('click', function() { searchResponse('next'); });
 
     $('#generate-mock-btn').addEventListener('click', generateMock);
+
+    $('#ai-generate-tests-btn').addEventListener('click', generateTestsViaAI);
 
     $('#copy-mock-btn').addEventListener('click', function() {
       var text = mockOutputCm ? mockOutputCm.getValue() : '';
