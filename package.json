@@ -9,7 +9,13 @@
   "whistleConfig": {
     "name": "Postman",
     "tab": "/ui/index.html",
-    "comTab": "/ui/index.html"
+    "comTab": "/ui/index.html",
+    "networkMenus": [
+      {
+        "name": "Edit in Postman",
+        "action": "/ui/index.html"
+      }
+    ]
   },
   "dependencies": {},
   "engines": {

@@ -477,6 +477,39 @@ function handleRequest(req, res, storageObj) {
     return;
   }
   
+  if (pathname === '/api/rules') {
+    if (req.method === 'GET') {
+      var rulesData = readStorage(storageObj, 'active_rules', { rules: '', values: {}, updatedAt: null });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ result: 'ok', data: rulesData }));
+    } else if (req.method === 'POST') {
+      var body = '';
+      req.on('data', function(chunk) { body += chunk; });
+      req.on('end', function() {
+        try {
+          var data = JSON.parse(body);
+          var rulesEntry = {
+            rules: data.rules || '',
+            values: data.values || {},
+            name: data.name || '',
+            updatedAt: new Date().toISOString()
+          };
+          writeStorage(storageObj, 'active_rules', rulesEntry);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ result: 'ok', rules: rulesEntry.rules, values: rulesEntry.values }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ result: 'error', data: e.message }));
+        }
+      });
+    } else if (req.method === 'DELETE') {
+      writeStorage(storageObj, 'active_rules', { rules: '', values: {}, updatedAt: new Date().toISOString() });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ result: 'ok' }));
+    }
+    return;
+  }
+  
   if (pathname.startsWith('/ui/')) {
     var filePath = path.join(UI_PATH, pathname.slice(4));
     if (!fs.existsSync(filePath)) {
