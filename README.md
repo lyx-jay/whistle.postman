@@ -10,6 +10,10 @@ A Postman-like HTTP request management plugin for Whistle debugging proxy.
 - **Collections**: Save and organize requests in virtual folder structure
 - **AI Mock**: Generate mock responses using AI based on request context or JSON schema
 - **HTTP Client**: Send requests and view responses with Body/Headers/Cookies tabs
+- **Pre-request Scripts**: Execute JavaScript before sending requests
+- **Tests**: Validate responses with assertions
+- **Whistle Rules**: Generate and apply mock/redirect/delay rules
+- **Network Integration**: Import requests from Whistle Network panel
 
 ## Installation
 
@@ -45,6 +49,39 @@ Create environments in Settings and use `{{variableName}}` in:
 - Query Parameters
 - Request Body
 
+### Pre-request Scripts
+
+Execute JavaScript before sending requests:
+```javascript
+// Set variables
+pm.variables.set('token', 'abc123');
+
+// Modify request
+pm.request.headers['Authorization'] = 'Bearer ' + pm.variables.get('token');
+```
+
+### Tests
+
+Validate responses with assertions:
+```javascript
+pm.test('Status is 200', function() {
+  pm.expect(pm.response.status).toBe(200);
+});
+
+pm.test('Response has id', function() {
+  var body = pm.response.json();
+  pm.expect(body).toHaveProperty('id');
+});
+```
+
+### Whistle Rules
+
+Generate and apply Whistle rules:
+- **Mock Response**: Return mock data for a URL
+- **Redirect**: Redirect to another URL
+- **Add Delay**: Simulate slow network
+- **Throttle**: Limit bandwidth
+
 ### AI Mock
 
 1. Go to "AI Mock" tab
@@ -77,6 +114,29 @@ Plugin data is stored in:
 ├── collections.json
 └── mock-templates.json
 ```
+
+## Development
+
+### Build
+
+```bash
+npm run build
+```
+
+### Publish
+
+```bash
+# Interactive publish with version bump
+bash scripts/publish.sh
+
+# Or manually
+npm version patch|minor|major
+npm publish
+```
+
+### Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 

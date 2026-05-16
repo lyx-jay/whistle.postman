@@ -3,6 +3,21 @@
   "version": "1.0.0",
   "description": "Postman-like HTTP request management plugin for Whistle",
   "main": "index.js",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "lint": "echo 'No linter configured'",
+    "test": "echo 'No tests configured'",
+    "prepublishOnly": "npm run build && echo 'Ready to publish'",
+    "version": "npm run build && git add -A",
+    "postversion": "git push && git push --tags"
+  },
+  "files": [
+    "index.js",
+    "lib/",
+    "ui/",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "keywords": ["whistle", "plugin", "http", "postman", "api", "debug", "curl", "mock"],
   "author": "",
   "license": "MIT",
@@ -23,6 +38,10 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
-  }
+    "url": "https://github.com/nicknisi/whistle.postman.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nicknisi/whistle.postman/issues"
+  },
+  "homepage": "https://github.com/nicknisi/whistle.postman#readme"
 }
