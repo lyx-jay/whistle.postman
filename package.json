@@ -1,6 +1,6 @@
 {
   "name": "whistle.postman",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Postman-like HTTP request management plugin for Whistle",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,16 @@
     "README.md",
     "CHANGELOG.md"
   ],
-  "keywords": ["whistle", "plugin", "http", "postman", "api", "debug", "curl", "mock"],
+  "keywords": [
+    "whistle",
+    "plugin",
+    "http",
+    "postman",
+    "api",
+    "debug",
+    "curl",
+    "mock"
+  ],
   "author": "",
   "license": "MIT",
   "whistleConfig": {
