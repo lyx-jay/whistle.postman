@@ -5,8 +5,11 @@ var path = require('path');
 var fs = require('fs');
 
 var ValuesStore = require('./lib/values-store');
+var MockRulesManager = require('./lib/mock-rules');
 
 var PLUGIN_NAME = 'whistle.postman';
+var valuesDir = path.join(__dirname, 'values');
+var mockManager = new MockRulesManager(valuesDir);
 var UI_PATH = path.join(__dirname, 'ui');
 
 var storage = {
