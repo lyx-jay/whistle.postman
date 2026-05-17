@@ -1186,27 +1186,39 @@
     var pattern = host ? host[1] + urlPath : urlPath;
 
     var mockBody = res.body || '{"message": "mock"}';
-    var rule = pattern + ' resBody://`' + mockBody + '`';
 
     Components.prompt({
       title: 'Mock This URL',
-      message: 'Create a mock rule that returns the current response for this URL.',
+      message: 'Create a mock rule that returns the current response for this URL. The mock will be active immediately.',
       placeholder: 'Rule name',
       defaultValue: 'Mock ' + req.method + ' ' + urlPath
     }).then(function(ruleName) {
       if (!ruleName) return;
 
-      api('/api/rules', {
+      // Use the new mock-rules API
+      api('/api/mock-rules', {
         method: 'POST',
         body: {
-          rules: rule,
-          values: {},
-          name: ruleName
+          name: ruleName,
+          url: req.url,
+          urlPath: pattern,
+          method: req.method,
+          statusCode: res.status || 200,
+          headers: res.headers || { 'Content-Type': 'application/json' },
+          responseBody: mockBody
         }
       }).then(function(data) {
-        Components.Toast.success('Mock rule created! This URL will now return mock data.');
+        if (data.result === 'ok') {
+          Components.Toast.success('Mock rule created! Requests to this URL will now return mock data.');
+          // Refresh mock panel
+          if (window.MockPanel) {
+            MockPanel.loadMocks();
+          }
+        } else {
+          Components.Toast.error('Failed to create mock: ' + (data.data || 'Unknown error'));
+        }
       }).catch(function(err) {
-        Components.Toast.error('Error creating rule: ' + err.message);
+        Components.Toast.error('Error creating mock: ' + err.message);
       });
     });
   }
@@ -1909,11 +1921,49 @@
         return;
       }
 
-      api('/api/rules', {
-        method: 'POST',
-        body: { rules: rules }
-      }).then(function() {
-        Components.Toast.success('Rules applied successfully!');
+      var ruleType = state.currentRuleType || 'mock';
+      var pattern = state.currentRulePattern || '';
+      var ruleContent = state.currentRuleContent || '';
+
+      // Extract URL from pattern
+      var url = pattern;
+
+      Components.prompt({
+        title: 'Add to Mock Panel',
+        message: 'Enter a name for this rule:',
+        placeholder: ruleType.charAt(0).toUpperCase() + ruleType.slice(1) + ' rule'
+      }).then(function(name) {
+        if (!name) return;
+
+        var mockData = {
+          name: name,
+          url: url,
+          urlPath: pattern,
+          method: state.currentRequest.method || 'GET',
+          ruleType: ruleType,
+          ruleContent: ruleContent
+        };
+
+        // For mock type, include responseBody
+        if (ruleType === 'mock') {
+          mockData.responseBody = ruleContent;
+        }
+
+        api('/api/mock-rules', {
+          method: 'POST',
+          body: mockData
+        }).then(function(data) {
+          if (data.result === 'ok') {
+            Components.Toast.success('Rule added to Mock Panel!');
+            if (window.MockPanel) {
+              MockPanel.loadMocks();
+            }
+          } else {
+            Components.Toast.error('Failed to add rule');
+          }
+        }).catch(function(err) {
+          Components.Toast.error('Error: ' + err.message);
+        });
       });
     });
 
@@ -2061,9 +2111,14 @@
     var host = req.url.match(/^https?:\/\/([^\/]+)/);
     var pattern = host ? host[1] + urlPath : urlPath;
 
+    // Store current rule type for later use
+    state.currentRuleType = type;
+    state.currentRulePattern = pattern;
+
     switch (type) {
       case 'mock':
         var body = state.response && state.response.body ? state.response.body : '{"message": "mock response"}';
+        state.currentRuleContent = body;
         var rule = pattern + ' resBody://`' + body + '`';
         if (rulesEditor) rulesEditor.setValue(rule);
         break;
@@ -2075,6 +2130,7 @@
           defaultValue: 'http://localhost:3000' + urlPath
         }).then(function(target) {
           if (target && rulesEditor) {
+            state.currentRuleContent = target;
             rulesEditor.setValue(pattern + ' ' + target);
           }
         });
@@ -2087,6 +2143,7 @@
           defaultValue: '2000'
         }).then(function(ms) {
           if (ms && rulesEditor) {
+            state.currentRuleContent = ms;
             rulesEditor.setValue(pattern + ' resDelay://' + ms);
           }
         });
@@ -2099,6 +2156,7 @@
           defaultValue: '100'
         }).then(function(speed) {
           if (speed && rulesEditor) {
+            state.currentRuleContent = speed;
             rulesEditor.setValue(pattern + ' resSpeed://' + speed);
           }
         });

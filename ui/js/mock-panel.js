@@ -32,14 +32,39 @@
       this.mocks.forEach(function(mock) {
         var statusClass = mock.enabled ? 'enabled' : 'disabled';
         var toggleText = mock.enabled ? 'Disable' : 'Enable';
+        var ruleType = mock.ruleType || 'mock';
         
-        html += '<div class="mock-rule-item ' + statusClass + '" data-id="' + mock.id + '">';
+        // Rule type icons and labels
+        var typeIcons = {
+          'mock': '\u{1f3ad}',      // 🎭
+          'redirect': '\u{2197}\u{fe0f}',  // ↗️
+          'delay': '\u{23f1}\u{fe0f}',     // ⏱️
+          'throttle': '\u{1f40c}'   // 🐌
+        };
+        var typeLabels = {
+          'mock': 'Mock',
+          'redirect': 'Redirect',
+          'delay': 'Delay',
+          'throttle': 'Throttle'
+        };
+        
+        html += '<div class="mock-rule-item ' + statusClass + ' mock-type-' + ruleType + '" data-id="' + mock.id + '">';
         html += '  <div class="mock-rule-header">';
-        html += '    <span class="mock-method">' + (mock.method || 'GET') + '</span>';
+        html += '    <span class="mock-type-icon" title="' + (typeLabels[ruleType] || 'Mock') + '">' + (typeIcons[ruleType] || typeIcons['mock']) + '</span>';
         html += '    <span class="mock-name">' + escapeHtml(mock.name) + '</span>';
         html += '    <span class="mock-status">' + (mock.enabled ? '\u25cf Active' : '\u25cb Inactive') + '</span>';
         html += '  </div>';
         html += '  <div class="mock-rule-url">' + escapeHtml(mock.urlPath || mock.url) + '</div>';
+        html += '  <div class="mock-rule-info">';
+        html += '    <span class="mock-rule-type">' + (typeLabels[ruleType] || 'Mock') + '</span>';
+        if (ruleType === 'redirect' && mock.ruleContent) {
+          html += '    <span class="mock-rule-detail">\u2192 ' + escapeHtml(mock.ruleContent) + '</span>';
+        } else if (ruleType === 'delay' && mock.ruleContent) {
+          html += '    <span class="mock-rule-detail">' + mock.ruleContent + 'ms</span>';
+        } else if (ruleType === 'throttle' && mock.ruleContent) {
+          html += '    <span class="mock-rule-detail">' + mock.ruleContent + ' KB/s</span>';
+        }
+        html += '  </div>';
         html += '  <div class="mock-rule-actions">';
         html += '    <button class="mock-toggle-btn" data-id="' + mock.id + '">' + toggleText + '</button>';
         html += '    <button class="mock-edit-btn" data-id="' + mock.id + '">Edit</button>';

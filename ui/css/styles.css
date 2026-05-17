@@ -1871,14 +1871,10 @@ svg {
   margin-bottom: var(--space-1);
 }
 
-.mock-method {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
-  background: rgba(93, 184, 166, 0.1);
-  color: var(--color-info);
-  border-radius: var(--radius-sm);
+.mock-type-icon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
 }
 
 .mock-name {
@@ -1901,6 +1897,48 @@ svg {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mock-rule-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.mock-rule-type {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-card);
+  color: var(--color-body);
+}
+
+.mock-type-mock .mock-rule-type {
+  background: rgba(93, 184, 166, 0.1);
+  color: var(--color-info);
+}
+
+.mock-type-redirect .mock-rule-type {
+  background: rgba(93, 184, 114, 0.1);
+  color: var(--color-success);
+}
+
+.mock-type-delay .mock-rule-type {
+  background: rgba(212, 160, 23, 0.1);
+  color: var(--color-warning);
+}
+
+.mock-type-throttle .mock-rule-type {
+  background: rgba(198, 69, 69, 0.1);
+  color: var(--color-error);
+}
+
+.mock-rule-detail {
+  font-size: 11px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
 }
 
 .mock-rule-actions {
