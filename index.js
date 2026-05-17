@@ -482,6 +482,81 @@ function handleRequest(req, res, storageObj) {
     return;
   }
   
+  if (pathname === '/api/mock-rules' && req.method === 'GET') {
+    var mocks = mockManager.getMocks();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ result: 'ok', data: mocks }));
+    return;
+  }
+
+  if (pathname === '/api/mock-rules' && req.method === 'POST') {
+    var body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        var data = JSON.parse(body);
+        var mock = mockManager.createMock(data);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ result: 'ok', data: mock }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ result: 'error', data: e.message }));
+      }
+    });
+    return;
+  }
+
+  if (pathname.match(/^\/api\/mock-rules\/[\w-]+$/) && req.method === 'PUT') {
+    var id = pathname.split('/').pop();
+    var body = '';
+    req.on('data', function(chunk) { body += chunk; });
+    req.on('end', function() {
+      try {
+        var data = JSON.parse(body);
+        var mock = mockManager.updateMock(id, data);
+        if (mock) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ result: 'ok', data: mock }));
+        } else {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ result: 'error', data: 'Mock not found' }));
+        }
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ result: 'error', data: e.message }));
+      }
+    });
+    return;
+  }
+
+  if (pathname.match(/^\/api\/mock-rules\/[\w-]+$/) && req.method === 'DELETE') {
+    var id = pathname.split('/').pop();
+    mockManager.deleteMock(id);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ result: 'ok' }));
+    return;
+  }
+
+  if (pathname.match(/^\/api\/mock-rules\/[\w-]+\/toggle$/) && req.method === 'POST') {
+    var id = pathname.split('/')[3];
+    var mock = mockManager.toggleMock(id);
+    if (mock) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ result: 'ok', data: mock }));
+    } else {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ result: 'error', data: 'Mock not found' }));
+    }
+    return;
+  }
+
+  if (pathname === '/api/mock-rules' && req.method === 'DELETE') {
+    mockManager.deleteAllMocks();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ result: 'ok' }));
+    return;
+  }
+
   if (pathname === '/api/rules') {
     if (req.method === 'GET') {
       var rulesData = readStorage(storageObj, 'active_rules', { rules: '', values: {}, updatedAt: null });
