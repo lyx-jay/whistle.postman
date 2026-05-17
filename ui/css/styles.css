@@ -890,12 +890,12 @@ input::placeholder {
   color: var(--color-muted-soft);
 }
 
-/* === Response Section (Claude style - dark surface) === */
+/* === Response Section (Claude style - warm dark surface) === */
 .response-section {
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--color-hairline);
-  background: var(--color-surface-dark);
+  background: #2d2928;
   min-height: 200px;
 }
 
@@ -915,14 +915,14 @@ input::placeholder {
   justify-content: space-between;
   align-items: center;
   padding: var(--space-3) var(--space-4);
-  background: var(--color-surface-dark-elevated);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: #342f2e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .response-title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-on-dark);
+  color: #e8e0d2;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -946,7 +946,7 @@ input::placeholder {
 .response-time,
 .response-size {
   font-size: 12px;
-  color: var(--color-on-dark-soft);
+  color: #a09d96;
   font-family: var(--font-mono);
 }
 
@@ -956,10 +956,10 @@ input::placeholder {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-1) var(--space-3);
-  background: var(--color-surface-dark-soft);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #3d3836;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
-  color: var(--color-on-dark-soft);
+  color: #a09d96;
   font-size: 12px;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -967,8 +967,8 @@ input::placeholder {
 
 .copy-response-btn:hover,
 .mock-this-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-on-dark);
+  background: #4a4442;
+  color: #e8e0d2;
 }
 
 .copy-response-btn svg,
@@ -983,25 +983,25 @@ input::placeholder {
   align-items: center;
   gap: var(--space-1);
   padding: 0 var(--space-4);
-  background: var(--color-surface-dark);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: #2d2928;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .response-tabs .tab-btn {
-  color: var(--color-on-dark-soft);
+  color: #a09d96;
   border-bottom-color: transparent;
 }
 
 .response-tabs .tab-btn:hover {
-  color: var(--color-on-dark);
+  color: #e8e0d2;
 }
 
 .response-tabs .tab-btn.active {
-  color: var(--color-on-dark);
+  color: #e8e0d2;
   border-bottom-color: var(--color-primary);
 }
 
-/* === Response Body (Claude style - dark code area) === */
+/* === Response Body (Claude style - warm dark code area) === */
 .response-body {
   flex: 1;
   padding: var(--space-4);
@@ -1009,15 +1009,15 @@ input::placeholder {
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;
-  color: var(--color-on-dark);
-  background: var(--color-surface-dark);
+  color: #e8e0d2;
+  background: #2d2928;
   white-space: pre-wrap;
   word-break: break-all;
 }
 
 .response-body mark {
-  background: rgba(204, 120, 92, 0.3);
-  color: var(--color-on-dark);
+  background: rgba(204, 120, 92, 0.35);
+  color: #e8e0d2;
   padding: 1px 2px;
   border-radius: 2px;
 }
@@ -1039,10 +1039,10 @@ input::placeholder {
   width: 200px;
   height: 28px;
   padding: 0 var(--space-3);
-  background: var(--color-surface-dark-soft);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #3d3836;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
-  color: var(--color-on-dark);
+  color: #e8e0d2;
   font-size: 12px;
 }
 
@@ -1052,12 +1052,12 @@ input::placeholder {
 }
 
 .response-search-input::placeholder {
-  color: var(--color-on-dark-soft);
+  color: #a09d96;
 }
 
 .search-match-count {
   font-size: 11px;
-  color: var(--color-on-dark-soft);
+  color: #a09d96;
   font-family: var(--font-mono);
 }
 
@@ -1069,15 +1069,15 @@ input::placeholder {
   height: 24px;
   background: none;
   border: none;
-  color: var(--color-on-dark-soft);
+  color: #a09d96;
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
 }
 
 .search-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-on-dark);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e8e0d2;
 }
 
 /* === Footer (Claude style) === */
@@ -1714,7 +1714,7 @@ input::placeholder {
   justify-content: center;
   height: 100%;
   min-height: 100px;
-  color: var(--color-on-dark-soft);
+  color: #a09d96;
   font-size: 13px;
 }
 
