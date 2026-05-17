@@ -1157,20 +1157,26 @@
     var mockBody = res.body || '{"message": "mock"}';
     var rule = pattern + ' resBody://`' + mockBody + '`';
 
-    var ruleName = prompt('Rule name (for reference):', 'Mock ' + req.method + ' ' + urlPath);
-    if (!ruleName) return;
+    Components.prompt({
+      title: 'Mock This URL',
+      message: 'Create a mock rule that returns the current response for this URL.',
+      placeholder: 'Rule name',
+      defaultValue: 'Mock ' + req.method + ' ' + urlPath
+    }).then(function(ruleName) {
+      if (!ruleName) return;
 
-    api('/api/rules', {
-      method: 'POST',
-      body: {
-        rules: rule,
-        values: {},
-        name: ruleName
-      }
-    }).then(function(data) {
-      Components.Toast.success('Mock rule created!');
-    }).catch(function(err) {
-      Components.Toast.error('Error creating rule: ' + err.message);
+      api('/api/rules', {
+        method: 'POST',
+        body: {
+          rules: rule,
+          values: {},
+          name: ruleName
+        }
+      }).then(function(data) {
+        Components.Toast.success('Mock rule created! This URL will now return mock data.');
+      }).catch(function(err) {
+        Components.Toast.error('Error creating rule: ' + err.message);
+      });
     });
   }
 
@@ -1456,20 +1462,28 @@
       return;
     }
 
-    var name = prompt('Enter template name:');
-    if (!name) return;
+    Components.prompt({
+      title: 'Save as Template',
+      message: 'Enter a name for this mock template:',
+      placeholder: 'Template name'
+    }).then(function(name) {
+      if (!name) return;
 
-    try {
-      var mock = JSON.parse(mockContent);
-      api('/api/mock-templates', {
-        method: 'POST',
-        body: { name: name, mock: mock }
-      }).then(function() {
-        loadMockTemplates();
-      }).catch(alert);
-    } catch (e) {
-      Components.Toast.error('Invalid mock JSON');
-    }
+      try {
+        var mock = JSON.parse(mockContent);
+        api('/api/mock-templates', {
+          method: 'POST',
+          body: { name: name, mock: mock }
+        }).then(function() {
+          loadMockTemplates();
+          Components.Toast.success('Template saved');
+        }).catch(function(err) {
+          Components.Toast.error('Failed to save template');
+        });
+      } catch (e) {
+        Components.Toast.error('Invalid mock JSON');
+      }
+    });
   }
 
   function applyMockTemplate(tpl) {
@@ -1484,27 +1498,42 @@
       Components.Toast.warning('No requests to save');
       return;
     }
-    
-    var folderId = prompt('Enter folder ID to save all requests:');
-    if (!folderId) return;
-    
-    var promises = state.history.map(function(item) {
-      return api('/api/collections', {
-        method: 'POST',
-        body: {
-          type: 'request',
-          name: (item.request.url || 'untitled').split('/').pop(),
-          folderId: folderId,
-          request: item.request
-        }
-      });
+
+    if (state.collections.folders.length === 0) {
+      Components.Toast.warning('Please create a folder first');
+      return;
+    }
+
+    // Show folder selection dialog
+    var folderOptions = state.collections.folders.map(function(f) {
+      return { label: f.name, value: f.id };
     });
-    
-    Promise.all(promises).then(function() {
-      Components.Toast.success('Saved ' + state.history.length + ' requests');
-      loadCollections();
-    }).catch(function(err) {
-      Components.Toast.error('Error: ' + err.message);
+
+    Components.prompt({
+      title: 'Save All Requests',
+      message: 'Enter folder ID to save all requests:',
+      placeholder: 'Folder ID'
+    }).then(function(folderId) {
+      if (!folderId) return;
+
+      var promises = state.history.map(function(item) {
+        return api('/api/collections', {
+          method: 'POST',
+          body: {
+            type: 'request',
+            name: (item.request.url || 'untitled').split('/').pop(),
+            folderId: folderId,
+            request: item.request
+          }
+        });
+      });
+
+      Promise.all(promises).then(function() {
+        Components.Toast.success('Saved ' + state.history.length + ' requests');
+        loadCollections();
+      }).catch(function(err) {
+        Components.Toast.error('Error: ' + err.message);
+      });
     });
   }
 
@@ -2000,29 +2029,49 @@
     var urlPath = req.url.replace(/^https?:\/\/[^\/]+/, '');
     var host = req.url.match(/^https?:\/\/([^\/]+)/);
     var pattern = host ? host[1] + urlPath : urlPath;
-    var rule = '';
 
     switch (type) {
       case 'mock':
         var body = state.response && state.response.body ? state.response.body : '{"message": "mock response"}';
-        rule = pattern + ' resBody://`' + body + '`';
+        var rule = pattern + ' resBody://`' + body + '`';
+        if (rulesEditor) rulesEditor.setValue(rule);
         break;
       case 'redirect':
-        var target = prompt('Redirect to URL:', 'http://localhost:3000' + urlPath);
-        if (target) rule = pattern + ' ' + target;
+        Components.prompt({
+          title: 'Redirect Rule',
+          message: 'Enter the URL to redirect to:',
+          placeholder: 'http://localhost:3000' + urlPath,
+          defaultValue: 'http://localhost:3000' + urlPath
+        }).then(function(target) {
+          if (target && rulesEditor) {
+            rulesEditor.setValue(pattern + ' ' + target);
+          }
+        });
         break;
       case 'delay':
-        var ms = prompt('Delay in milliseconds:', '2000');
-        if (ms) rule = pattern + ' resDelay://' + ms;
+        Components.prompt({
+          title: 'Delay Rule',
+          message: 'Enter delay in milliseconds:',
+          placeholder: '2000',
+          defaultValue: '2000'
+        }).then(function(ms) {
+          if (ms && rulesEditor) {
+            rulesEditor.setValue(pattern + ' resDelay://' + ms);
+          }
+        });
         break;
       case 'throttle':
-        var speed = prompt('Speed in KB/s:', '100');
-        if (speed) rule = pattern + ' resSpeed://' + speed;
+        Components.prompt({
+          title: 'Throttle Rule',
+          message: 'Enter speed limit in KB/s:',
+          placeholder: '100',
+          defaultValue: '100'
+        }).then(function(speed) {
+          if (speed && rulesEditor) {
+            rulesEditor.setValue(pattern + ' resSpeed://' + speed);
+          }
+        });
         break;
-    }
-
-    if (rule && rulesEditor) {
-      rulesEditor.setValue(rule);
     }
   }
 
