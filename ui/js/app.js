@@ -740,7 +740,7 @@
       var parsed = JSON.parse(bodyEditorCm.getValue());
       bodyEditorCm.setValue(JSON.stringify(parsed, null, 2));
     } catch (e) {
-      alert('Invalid JSON: ' + e.message);
+      Components.Toast.error('Invalid JSON: ' + e.message);
     }
   }
 
@@ -1146,7 +1146,7 @@
     var res = state.response;
 
     if (!req.url || !res || res.error) {
-      alert('No valid response to mock');
+      Components.Toast.warning('No valid response to mock');
       return;
     }
 
@@ -1168,9 +1168,9 @@
         name: ruleName
       }
     }).then(function(data) {
-      alert('Mock rule created! The URL will now return mock data.');
+      Components.Toast.success('Mock rule created!');
     }).catch(function(err) {
-      alert('Error creating rule: ' + err.message);
+      Components.Toast.error('Error creating rule: ' + err.message);
     });
   }
 
@@ -1214,13 +1214,13 @@
   function generateTestsViaAI() {
     var res = state.response;
     if (!res || res.error) {
-      alert('No valid response to generate tests from. Send a request first.');
+      Components.Toast.warning('No valid response to generate tests from. Send a request first.');
       return;
     }
 
     var config = state.config || {};
     if (!config.aiApiKey) {
-      alert('Please configure AI API key in Settings first.');
+      Components.Toast.warning('Please configure AI API key in Settings first.');
       return;
     }
 
@@ -1247,7 +1247,7 @@
         scriptEditors.tests.setValue(tests);
       }
     }).catch(function(err) {
-      alert('AI generation failed: ' + err.message);
+      Components.Toast.error('AI generation failed: ' + err.message);
     }).finally(function() {
       btn.textContent = '🤖 AI Generate';
       btn.disabled = false;
@@ -1262,7 +1262,7 @@
         try {
           schema = JSON.parse(schemaVal);
         } catch (e) {
-          alert('Invalid JSON schema');
+          Components.Toast.error('Invalid JSON schema');
           return;
         }
       }
@@ -1334,7 +1334,7 @@
     var folderId = $('#save-folder-select').value;
     
     if (!folderId) {
-      alert('Please select a folder');
+      Components.Toast.warning('Please select a folder');
       return;
     }
     
@@ -1452,7 +1452,7 @@
   function saveCurrentMockAsTemplate() {
     var mockContent = mockOutputCm ? mockOutputCm.getValue().trim() : '';
     if (!mockContent) {
-      alert('No mock generated yet');
+      Components.Toast.warning('No mock generated yet');
       return;
     }
 
@@ -1468,7 +1468,7 @@
         loadMockTemplates();
       }).catch(alert);
     } catch (e) {
-      alert('Invalid mock JSON');
+      Components.Toast.error('Invalid mock JSON');
     }
   }
 
@@ -1481,7 +1481,7 @@
 
   function batchSaveRequests() {
     if (state.history.length === 0) {
-      alert('No requests to save');
+      Components.Toast.warning('No requests to save');
       return;
     }
     
@@ -1501,10 +1501,10 @@
     });
     
     Promise.all(promises).then(function() {
-      alert('Saved ' + state.history.length + ' requests');
+      Components.Toast.success('Saved ' + state.history.length + ' requests');
       loadCollections();
     }).catch(function(err) {
-      alert('Error: ' + err.message);
+      Components.Toast.error('Error: ' + err.message);
     });
   }
 
@@ -1845,7 +1845,7 @@
     $('#apply-rules-btn').addEventListener('click', function() {
       var rules = rulesEditor ? rulesEditor.getValue() : '';
       if (!rules.trim()) {
-        alert('No rules to apply');
+        Components.Toast.warning('No rules to apply');
         return;
       }
 
@@ -1853,21 +1853,24 @@
         method: 'POST',
         body: { rules: rules }
       }).then(function() {
-        alert('Rules applied successfully!');
+        Components.Toast.success('Rules applied successfully!');
       });
     });
 
     $('#clear-rules-btn').addEventListener('click', function() {
       api('/api/rules', { method: 'DELETE' }).then(function() {
         if (rulesEditor) rulesEditor.setValue('');
-        alert('Rules cleared');
+        Components.Toast.success('Rules cleared');
       });
     });
 
-    $('#copy-rules-btn').addEventListener('click', function() {
-      var rules = rulesEditor ? rulesEditor.getValue() : '';
-      if (rules) navigator.clipboard.writeText(rules);
-    });
+    var copyRulesBtn = $('#copy-rules-btn');
+    if (copyRulesBtn) {
+      copyRulesBtn.addEventListener('click', function() {
+        var rules = rulesEditor ? rulesEditor.getValue() : '';
+        if (rules) navigator.clipboard.writeText(rules);
+      });
+    }
 
     document.addEventListener('keydown', function(e) {
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
@@ -1990,7 +1993,7 @@
   function generateRule(type) {
     var req = state.currentRequest;
     if (!req.url) {
-      alert('Please enter a URL first');
+      Components.Toast.warning('Please enter a URL first');
       return;
     }
 
