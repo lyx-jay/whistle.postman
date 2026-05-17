@@ -4,6 +4,8 @@ var url = require('url');
 var path = require('path');
 var fs = require('fs');
 
+var ValuesStore = require('./lib/values-store');
+
 var PLUGIN_NAME = 'whistle.postman';
 var UI_PATH = path.join(__dirname, 'ui');
 
