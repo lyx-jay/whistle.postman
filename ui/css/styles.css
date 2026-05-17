@@ -2035,6 +2035,41 @@ svg {
   color: var(--color-muted);
 }
 
+.mock-edit-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.mock-edit-label-row label {
+  margin-bottom: 0;
+}
+
+.mock-edit-tools {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mock-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-sm);
+  color: var(--color-body);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mock-tool-btn:hover {
+  background: var(--color-surface-cream-strong);
+  border-color: var(--color-muted-soft);
+}
+
 .mock-edit-input {
   width: 100%;
   height: var(--input-height);

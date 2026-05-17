@@ -151,7 +151,14 @@
               '<input type="text" id="mock-edit-name" class="mock-edit-input">' +
             '</div>' +
             '<div class="mock-edit-field">' +
-              '<label>Response Body:</label>' +
+              '<div class="mock-edit-label-row">' +
+                '<label>Response Body:</label>' +
+                '<div class="mock-edit-tools">' +
+                  '<button class="mock-tool-btn" id="mock-format-btn" title="Format JSON">{ } Format</button>' +
+                  '<button class="mock-tool-btn" id="mock-search-btn" title="Search (Ctrl+F)">\u{1f50d} Search</button>' +
+                  '<button class="mock-tool-btn" id="mock-replace-btn" title="Replace (Ctrl+H)">\u{1f504} Replace</button>' +
+                '</div>' +
+              '</div>' +
               '<div class="mock-edit-editor-wrap">' +
                 '<textarea id="mock-edit-body"></textarea>' +
               '</div>' +
@@ -176,7 +183,13 @@
           autoCloseBrackets: true,
           indentUnit: 2,
           tabSize: 2,
-          lineWrapping: true
+          lineWrapping: true,
+          extraKeys: {
+            'Ctrl-F': 'findPersistent',
+            'Cmd-F': 'findPersistent',
+            'Ctrl-H': 'replace',
+            'Cmd-H': 'replace'
+          }
         });
       }
 
@@ -195,6 +208,30 @@
         if (e.target === editModal) {
           self.closeEditModal();
         }
+      });
+
+      // Format JSON button
+      document.getElementById('mock-format-btn').addEventListener('click', function() {
+        if (!editEditor) return;
+        try {
+          var parsed = JSON.parse(editEditor.getValue());
+          editEditor.setValue(JSON.stringify(parsed, null, 2));
+          Components.Toast.success('JSON formatted');
+        } catch (e) {
+          Components.Toast.error('Invalid JSON: ' + e.message);
+        }
+      });
+
+      // Search button
+      document.getElementById('mock-search-btn').addEventListener('click', function() {
+        if (!editEditor) return;
+        editEditor.execCommand('findPersistent');
+      });
+
+      // Replace button
+      document.getElementById('mock-replace-btn').addEventListener('click', function() {
+        if (!editEditor) return;
+        editEditor.execCommand('replace');
       });
     },
 
