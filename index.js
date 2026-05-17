@@ -633,10 +633,22 @@ function createUiServer(server, options) {
   });
 }
 
+function createRulesServer(server, options) {
+  server.on('request', function(req, res) {
+    var rulesData = mockManager.generateRules();
+
+    res.end(JSON.stringify({
+      rules: rulesData.rules,
+      values: rulesData.values
+    }));
+  });
+}
+
 function createServer(whistleStorage) {
   return {
     name: PLUGIN_NAME,
-    uiServer: createUiServer(whistleStorage)
+    uiServer: createUiServer(whistleStorage),
+    rulesServer: createRulesServer
   };
 }
 

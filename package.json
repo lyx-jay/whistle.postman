@@ -34,6 +34,7 @@
     "name": "Postman",
     "tab": "/ui/index.html",
     "comTab": "/ui/index.html",
+    "rulesServer": true,
     "networkMenus": [
       {
         "name": "Edit in Postman",
