@@ -1,6 +1,6 @@
 {
   "name": "whistle.postman",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Postman-like HTTP request management plugin for Whistle",
   "main": "index.js",
   "scripts": {
