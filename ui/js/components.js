@@ -311,7 +311,8 @@
       html += escapeHtml(item.label);
       option.innerHTML = html;
       
-      option.addEventListener('click', function() {
+      option.addEventListener('click', function(e) {
+        e.stopPropagation();
         select.querySelector('.select-value').textContent = item.label;
         dropdown.querySelectorAll('.custom-select-option').forEach(function(opt) {
           opt.classList.remove('selected');

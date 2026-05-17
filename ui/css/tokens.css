@@ -15,7 +15,8 @@
   --color-surface-elevated: #252320;
   --color-surface-soft: #1f1e1b;
   --color-surface-card: #2a2825;
-  --color-surface-hover: #32302d;
+  --color-surface-hover: #5a5755;
+  --color-surface-active: #6a6765;
   
   /* Text */
   --color-text: #faf9f5;

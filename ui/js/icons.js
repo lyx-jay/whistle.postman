@@ -111,7 +111,11 @@
       '▼': 'chevron-down',
       '▲': 'chevron-up',
       '▶': 'chevron-right',
-      '◀': 'chevron-left'
+      '◀': 'chevron-left',
+      '✅': 'check-circle',
+      '❌': 'x-circle',
+      '✗': 'x',
+      '↕': 'chevron-down'
     };
 
     // Find all buttons and spans with emoji

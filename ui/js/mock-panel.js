@@ -34,10 +34,10 @@
       }
 
       var typeIcons = {
-        'mock': '\u{1f3ad}',
-        'redirect': '\u{2197}\u{fe0f}',
-        'delay': '\u{23f1}\u{fe0f}',
-        'throttle': '\u{1f40c}'
+        'mock': LucideIcons.get('wand-2', 14),
+        'redirect': LucideIcons.get('external-link', 14),
+        'delay': LucideIcons.get('clock', 14),
+        'throttle': LucideIcons.get('loader', 14)
       };
 
       var html = '<div class="mock-list-compact">';
@@ -143,7 +143,7 @@
         '<div class="mock-edit-content">' +
           '<div class="mock-edit-header">' +
             '<h3>Edit Mock Rule</h3>' +
-            '<button class="mock-edit-close">\u00d7</button>' +
+            '<button class="mock-edit-close"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>' +
           '</div>' +
           '<div class="mock-edit-body">' +
             '<div class="mock-edit-field">' +

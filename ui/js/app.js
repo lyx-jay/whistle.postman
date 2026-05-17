@@ -28,6 +28,14 @@
     testResults: []
   };
 
+  var customSelects = {
+    method: null,
+    environment: null,
+    bodyType: null,
+    authType: null,
+    aiProvider: null
+  };
+
   var $ = function(selector) {
     return document.querySelector(selector);
   };
@@ -602,17 +610,24 @@
   }
 
   function renderEnvironmentSelect() {
-    var select = $('#environment-select');
-    select.innerHTML = '<option value="">No Environment</option>';
-    
+    if (!customSelects.environment) return;
+
+    var items = [{ value: '', label: 'No Environment' }];
     for (var name in state.environments) {
-      var opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      select.appendChild(opt);
+      items.push({ value: name, label: name });
     }
+
+    var container = $('#environment-select-container');
+    container.innerHTML = '';
     
-    select.value = state.currentEnv;
+    customSelects.environment = window.Components.createCustomSelect(container, {
+      items: items,
+      value: state.currentEnv || '',
+      placeholder: 'No Environment',
+      onChange: function(value) {
+        state.currentEnv = value;
+      }
+    });
   }
 
   function loadConfig() {
@@ -657,7 +672,9 @@
   function renderCurrentRequest() {
     var req = state.currentRequest;
 
-    $('#method-select').value = req.method;
+    if (customSelects.method) {
+      customSelects.method.setValue(req.method);
+    }
     $('#url-input').value = req.url;
 
     renderKvList('params-list', req.params || {}, function() {
@@ -668,7 +685,9 @@
       updateRequestFromUI();
     });
 
-    $('#body-type-select').value = req.body ? req.body.type : 'none';
+    if (customSelects.bodyType) {
+      customSelects.bodyType.setValue(req.body ? req.body.type : 'none');
+    }
     renderBodyEditor();
     var content = req.body ? req.body.content : '';
     if (bodyEditorCm) {
@@ -676,7 +695,9 @@
       bodyEditorCm.refresh();
     }
 
-    $('#auth-type-select').value = req.auth ? req.auth.type : 'none';
+    if (customSelects.authType) {
+      customSelects.authType.setValue(req.auth ? req.auth.type : 'none');
+    }
     renderAuthConfig();
 
     if (scriptEditors.preScript) {
@@ -690,7 +711,7 @@
   }
 
   function renderBodyEditor() {
-    var bodyType = $('#body-type-select').value;
+    var bodyType = customSelects.bodyType ? customSelects.bodyType.getValue() : 'none';
     var jsonEditor = $('#body-json-editor');
     var formDataEditor = $('#body-form-data-editor');
     var formatBtn = $('#format-json-btn');
@@ -745,9 +766,9 @@
   }
 
   function updateRequestFromUI() {
-    state.currentRequest.method = $('#method-select').value;
+    state.currentRequest.method = customSelects.method ? customSelects.method.getValue() : 'GET';
     state.currentRequest.url = $('#url-input').value;
-    var bodyType = $('#body-type-select').value;
+    var bodyType = customSelects.bodyType ? customSelects.bodyType.getValue() : 'none';
     var bodyContent = '';
     if (bodyType === 'json' && bodyEditorCm) {
       bodyContent = bodyEditorCm.getValue();
@@ -760,7 +781,7 @@
       content: bodyContent
     };
     state.currentRequest.auth = {
-      type: $('#auth-type-select').value
+      type: customSelects.authType ? customSelects.authType.getValue() : 'none'
     };
     if (scriptEditors.preScript) {
       state.currentRequest.preScript = scriptEditors.preScript.getValue();
@@ -772,7 +793,7 @@
 
   function renderAuthConfig() {
     var container = $('#auth-config');
-    var authType = $('#auth-type-select').value;
+    var authType = customSelects.authType ? customSelects.authType.getValue() : 'none';
     
     container.innerHTML = '';
     
@@ -804,16 +825,32 @@
         '</div>' +
         '<div class="form-group">' +
           '<label>Add to:</label>' +
-          '<select id="auth-key-location" class="text-input">' +
-            '<option value="header">Header</option>' +
-            '<option value="query">Query Param</option>' +
-          '</select>' +
+          '<div id="auth-key-location-container" class="auth-key-location-container"></div>' +
         '</div>';
+      
+      setTimeout(function() {
+        var locationContainer = $('#auth-key-location-container');
+        if (locationContainer && window.Components && window.Components.createCustomSelect) {
+          window.Components.createCustomSelect(locationContainer, {
+            items: [
+              { value: 'header', label: 'Header' },
+              { value: 'query', label: 'Query Param' }
+            ],
+            value: 'header',
+            onChange: function(value) {
+              state.currentRequest.auth = state.currentRequest.auth || {};
+              state.currentRequest.auth.keyLocation = value;
+            }
+          });
+        }
+      }, 0);
     }
   }
 
   function renderSettings() {
-    $('#ai-provider-select').value = state.config.aiProvider || 'openai';
+    if (customSelects.aiProvider) {
+      customSelects.aiProvider.setValue(state.config.aiProvider || 'openai');
+    }
     $('#ai-endpoint-input').value = state.config.aiEndpoint || '';
     $('#ai-apikey-input').value = state.config.aiApiKey || '';
     $('#ai-model-input').value = state.config.aiModel || 'gpt-4o-mini';
@@ -850,7 +887,7 @@
 
   function sendRequest() {
     var req = JSON.parse(JSON.stringify(state.currentRequest));
-    var envName = $('#environment-select').value;
+    var envName = customSelects.environment ? customSelects.environment.getValue() : '';
     var envs = state.environments || {};
     var envVars = envs[envName] || {};
 
@@ -944,7 +981,7 @@
     var html = '<h4>Test Results</h4>';
 
     state.testResults.forEach(function(result) {
-      var icon = result.passed ? '✅' : '❌';
+      var icon = result.passed ? LucideIcons.get('check-circle', 16) : LucideIcons.get('x-circle', 16);
       var cls = result.passed ? 'passed' : 'failed';
       html += '<div class="test-result-item ' + cls + '">';
       html += '<span class="test-result-icon">' + icon + '</span>';
@@ -1022,9 +1059,9 @@
     
     navigator.clipboard.writeText(text).then(function() {
       var btn = $('#copy-response-btn');
-      var orig = btn.textContent;
-      btn.textContent = '✓';
-      setTimeout(function() { btn.textContent = orig; }, 1500);
+      var orig = btn.innerHTML;
+      btn.innerHTML = LucideIcons.get('check', 14);
+      setTimeout(function() { btn.innerHTML = orig; }, 1500);
     });
   }
 
@@ -1254,9 +1291,9 @@
     
     navigator.clipboard.writeText(curlCmd).then(function() {
       var btn = $('#copy-curl-btn');
-      var orig = btn.textContent;
-      btn.textContent = '✓ Copied!';
-      setTimeout(function() { btn.textContent = orig; }, 1500);
+      var orig = btn.innerHTML;
+      btn.innerHTML = LucideIcons.get('check', 14) + ' Copied!';
+      setTimeout(function() { btn.innerHTML = orig; }, 1500);
     });
   }
 
@@ -1351,7 +1388,7 @@
 
   function showMockFeedback(success, message) {
     var btn = $('#generate-mock-btn');
-    btn.textContent = success ? '✓ Success' : '✗ Failed';
+    btn.innerHTML = success ? LucideIcons.get('check', 14) + ' Success' : LucideIcons.get('x', 14) + ' Failed';
     btn.style.background = success ? '#49cc18' : '#f93e3e';
     
     setTimeout(function() {
@@ -1426,7 +1463,7 @@
         item.classList.add('selected');
         display.textContent = folder.name;
       }
-      item.innerHTML = '<span class="folder-icon">📁</span><span>' + escapeHtml(folder.name) + '</span>';
+      item.innerHTML = '<span class="folder-icon">' + LucideIcons.get('folder', 16) + '</span><span>' + escapeHtml(folder.name) + '</span>';
       item.addEventListener('click', function(e) {
         e.stopPropagation();
         hiddenInput.value = folder.id;
@@ -1449,7 +1486,7 @@
 
   function saveConfig() {
     var config = {
-      aiProvider: $('#ai-provider-select').value,
+      aiProvider: customSelects.aiProvider ? customSelects.aiProvider.getValue() : 'openai',
       aiEndpoint: $('#ai-endpoint-input').value,
       aiApiKey: $('#ai-apikey-input').value,
       aiModel: $('#ai-model-input').value || 'gpt-4o-mini'
@@ -1620,6 +1657,98 @@
     $('#' + id).classList.add('hidden');
   }
 
+  function initCustomSelects() {
+    var Components = window.Components;
+    if (!Components || !Components.createCustomSelect) {
+      console.error('Components not loaded');
+      return;
+    }
+
+    customSelects.method = Components.createCustomSelect(
+      $('#method-select-container'),
+      {
+        items: [
+          { value: 'GET', label: 'GET' },
+          { value: 'POST', label: 'POST' },
+          { value: 'PUT', label: 'PUT' },
+          { value: 'PATCH', label: 'PATCH' },
+          { value: 'DELETE', label: 'DELETE' },
+          { value: 'HEAD', label: 'HEAD' },
+          { value: 'OPTIONS', label: 'OPTIONS' }
+        ],
+        value: state.currentRequest.method || 'GET',
+        onChange: function(value) {
+          state.currentRequest.method = value;
+          updateRequestFromUI();
+        }
+      }
+    );
+
+    customSelects.environment = Components.createCustomSelect(
+      $('#environment-select-container'),
+      {
+        items: [{ value: '', label: 'No Environment' }],
+        value: '',
+        placeholder: 'No Environment',
+        onChange: function(value) {
+          state.currentEnv = value;
+        }
+      }
+    );
+
+    customSelects.bodyType = Components.createCustomSelect(
+      $('#body-type-select-container'),
+      {
+        items: [
+          { value: 'none', label: 'none' },
+          { value: 'json', label: 'JSON' },
+          { value: 'form-data', label: 'form-data' },
+          { value: 'raw', label: 'raw' }
+        ],
+        value: 'none',
+        onChange: function(value) {
+          state.currentRequest.body = state.currentRequest.body || {};
+          state.currentRequest.body.type = value;
+          updateRequestFromUI();
+          renderBodyEditor();
+        }
+      }
+    );
+
+    customSelects.authType = Components.createCustomSelect(
+      $('#auth-type-select-container'),
+      {
+        items: [
+          { value: 'none', label: 'No Auth' },
+          { value: 'bearer', label: 'Bearer Token' },
+          { value: 'basic', label: 'Basic Auth' },
+          { value: 'apikey', label: 'API Key' }
+        ],
+        value: 'none',
+        onChange: function(value) {
+          state.currentRequest.auth = state.currentRequest.auth || {};
+          state.currentRequest.auth.type = value;
+          updateRequestFromUI();
+          renderAuthConfig();
+        }
+      }
+    );
+
+    customSelects.aiProvider = Components.createCustomSelect(
+      $('#ai-provider-select-container'),
+      {
+        items: [
+          { value: 'openai', label: 'OpenAI' },
+          { value: 'custom', label: 'Custom Endpoint' }
+        ],
+        value: state.config.aiProvider || 'openai',
+        onChange: function(value) {
+          state.config.aiProvider = value;
+        }
+      }
+    );
+  }
+
   function initEventListeners() {
     $('#import-btn').addEventListener('click', function() {
       openModal('import-modal');
@@ -1638,16 +1767,7 @@
 
     $('#send-btn').addEventListener('click', sendRequest);
 
-    $('#method-select').addEventListener('change', updateRequestFromUI);
     $('#url-input').addEventListener('change', updateRequestFromUI);
-    $('#body-type-select').addEventListener('change', function() {
-      updateRequestFromUI();
-      renderBodyEditor();
-    });
-    $('#auth-type-select').addEventListener('change', function() {
-      updateRequestFromUI();
-      renderAuthConfig();
-    });
 
     $('#format-json-btn').addEventListener('click', formatJsonBody);
 
@@ -2186,6 +2306,7 @@
   }
 
   function init() {
+    initCustomSelects();
     initScriptEditors();
     initAiMockEditors();
     initRulesEditor();
@@ -2195,6 +2316,7 @@
     loadCollections();
     loadEnvironments();
     loadMockTemplates();
+    loadConfig();
     renderCurrentRequest();
 
     if (typeof MockPanel !== 'undefined') {
