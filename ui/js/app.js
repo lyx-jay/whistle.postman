@@ -434,30 +434,163 @@
   function renderCollections() {
     var container = $('#collections-tree');
     container.innerHTML = '';
-    
+
     state.collections.folders.forEach(function(folder) {
       var folderEl = document.createElement('div');
       folderEl.className = 'folder-item';
-      folderEl.innerHTML = '<span class="folder-icon">📁</span>' + escapeHtml(folder.name);
+      folderEl.innerHTML = '<span class="folder-icon">' + LucideIcons.get('folder', 14) + '</span>' + escapeHtml(folder.name);
+      folderEl.dataset.folderId = folder.id;
+
+      // Right-click context menu for folder
+      folderEl.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showFolderContextMenu(e, folder);
+      });
+
       container.appendChild(folderEl);
-      
+
       var folderRequests = state.collections.requests.filter(function(r) {
         return r.folderId === folder.id;
       });
-      
+
       folderRequests.forEach(function(req) {
         var reqEl = document.createElement('div');
         reqEl.className = 'request-item';
         reqEl.style.paddingLeft = '24px';
         var method = req.request.method || 'GET';
-        reqEl.innerHTML = 
+        reqEl.innerHTML =
           '<span class="method-badge ' + method.toLowerCase() + '">' + method + '</span>' +
           '<span>' + escapeHtml(req.name) + '</span>';
         reqEl.addEventListener('click', function() {
           loadRequest(req.request);
         });
+
+        // Right-click context menu for request
+        reqEl.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          showRequestContextMenu(e, req, folder);
+        });
+
         container.appendChild(reqEl);
       });
+    });
+  }
+
+  function showFolderContextMenu(e, folder) {
+    Components.showContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      items: [
+        { icon: 'pencil', label: 'Rename', action: 'rename' },
+        { divider: true },
+        { icon: 'trash', label: 'Delete', action: 'delete', danger: true }
+      ],
+      onAction: function(action) {
+        if (action === 'rename') {
+          renameFolder(folder);
+        } else if (action === 'delete') {
+          deleteFolder(folder);
+        }
+      }
+    });
+  }
+
+  function showRequestContextMenu(e, req, folder) {
+    Components.showContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      items: [
+        { icon: 'pencil', label: 'Rename', action: 'rename' },
+        { divider: true },
+        { icon: 'trash', label: 'Delete', action: 'delete', danger: true }
+      ],
+      onAction: function(action) {
+        if (action === 'rename') {
+          renameRequest(req);
+        } else if (action === 'delete') {
+          deleteRequest(req);
+        }
+      }
+    });
+  }
+
+  function renameFolder(folder) {
+    Components.prompt({
+      title: 'Rename Folder',
+      message: 'Enter new folder name:',
+      defaultValue: folder.name,
+      placeholder: 'Folder name'
+    }).then(function(newName) {
+      if (newName && newName !== folder.name) {
+        folder.name = newName;
+        saveCollections();
+        renderCollections();
+        Components.Toast.success('Folder renamed');
+      }
+    });
+  }
+
+  function deleteFolder(folder) {
+    Components.confirm({
+      title: 'Delete Folder',
+      message: 'Are you sure you want to delete "' + folder.name + '"? All requests in this folder will also be deleted.',
+      confirmText: 'Delete',
+      danger: true,
+      icon: 'trash',
+      iconColor: 'var(--color-error)'
+    }).then(function(confirmed) {
+      if (confirmed) {
+        state.collections.folders = state.collections.folders.filter(function(f) { return f.id !== folder.id; });
+        state.collections.requests = state.collections.requests.filter(function(r) { return r.folderId !== folder.id; });
+        saveCollections();
+        renderCollections();
+        Components.Toast.success('Folder deleted');
+      }
+    });
+  }
+
+  function renameRequest(req) {
+    Components.prompt({
+      title: 'Rename Request',
+      message: 'Enter new request name:',
+      defaultValue: req.name,
+      placeholder: 'Request name'
+    }).then(function(newName) {
+      if (newName && newName !== req.name) {
+        req.name = newName;
+        saveCollections();
+        renderCollections();
+        Components.Toast.success('Request renamed');
+      }
+    });
+  }
+
+  function deleteRequest(req) {
+    Components.confirm({
+      title: 'Delete Request',
+      message: 'Are you sure you want to delete "' + req.name + '"?',
+      confirmText: 'Delete',
+      danger: true,
+      icon: 'trash',
+      iconColor: 'var(--color-error)'
+    }).then(function(confirmed) {
+      if (confirmed) {
+        state.collections.requests = state.collections.requests.filter(function(r) { return r.id !== req.id; });
+        saveCollections();
+        renderCollections();
+        Components.Toast.success('Request deleted');
+      }
+    });
+  }
+
+  function saveCollections() {
+    api('/api/collections', {
+      method: 'POST',
+      body: state.collections
+    }).catch(function(err) {
+      Components.Toast.error('Failed to save: ' + err.message);
     });
   }
 

@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Whistle Postman</title>
+  <link rel="stylesheet" href="/ui/css/tokens.css">
+  <link rel="stylesheet" href="/ui/css/components.css">
   <link rel="stylesheet" href="/ui/css/styles.css">
   <link rel="stylesheet" href="/ui/lib/atom-one-dark.min.css">
   <script src="/ui/lib/highlight.min.js"></script>
@@ -32,7 +34,7 @@
       <aside class="sidebar">
         <div class="sidebar-section">
           <button id="import-btn" class="sidebar-action-btn">
-            <span class="icon">↓</span> Import
+            <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></span> Import
           </button>
         </div>
 
@@ -46,12 +48,12 @@
         <div class="sidebar-section">
           <div class="section-header">
             <span class="section-title">Collections</span>
-            <button id="new-folder-btn" class="icon-btn-sm" title="New Folder">+</button>
+            <button id="new-folder-btn" class="icon-btn-sm" title="New Folder"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
           </div>
           <div id="new-folder-inline" class="new-folder-inline hidden">
             <input id="new-folder-input" type="text" class="new-folder-input" placeholder="Folder name">
-            <button id="new-folder-confirm" class="new-folder-btn">✓</button>
-            <button id="new-folder-cancel" class="new-folder-btn">×</button>
+            <button id="new-folder-confirm" class="new-folder-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+            <button id="new-folder-cancel" class="new-folder-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
           </div>
           <div id="collections-tree" class="request-list"></div>
         </div>
@@ -69,8 +71,8 @@
             <option value="OPTIONS">OPTIONS</option>
           </select>
           <input id="url-input" type="text" class="url-input" placeholder="Enter request URL or paste cURL">
-          <button id="copy-curl-btn" class="copy-curl-btn" title="Copy as cURL">📋 cURL</button>
-          <button id="send-btn" class="send-btn">Send</button>
+          <button id="copy-curl-btn" class="copy-curl-btn" title="Copy as cURL"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> cURL</button>
+          <button id="send-btn" class="send-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send</button>
         </div>
 
         <div class="editor-tabs">
@@ -197,7 +199,7 @@
           <div class="script-editor-panel">
             <div class="script-editor-header">
               <h3>Tests</h3>
-              <button id="ai-generate-tests-btn" class="ai-btn">🤖 AI Generate</button>
+              <button id="ai-generate-tests-btn" class="ai-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg> AI Generate</button>
               <span class="script-hint">Runs after response. Use pm.test() and pm.expect() to validate.</span>
             </div>
             <div class="script-editor-wrapper">
@@ -218,21 +220,51 @@
         <div class="tab-content" id="tab-rules">
           <div class="rules-panel">
             <div class="rules-header">
-              <h3>Generate Whistle Rules</h3>
-              <button id="copy-rules-btn" class="icon-btn-sm">Copy</button>
+              <h3>Whistle Rules</h3>
+              <a href="https://wproxy.org/docs/rules/rule.html" target="_blank" class="help-link">
+                <span class="icon-sm">?</span> Documentation
+              </a>
+            </div>
+            <div class="rules-info">
+              <div class="info-card">
+                <h4>What are Whistle Rules?</h4>
+                <p>Whistle rules allow you to intercept and modify HTTP requests/responses. Use them to:</p>
+                <ul>
+                  <li><strong>Mock</strong> - Return fake responses without hitting the server</li>
+                  <li><strong>Redirect</strong> - Forward requests to another URL or local server</li>
+                  <li><strong>Delay</strong> - Simulate slow network conditions</li>
+                  <li><strong>Throttle</strong> - Limit bandwidth for testing</li>
+                </ul>
+              </div>
             </div>
             <div class="rules-actions">
-              <button class="rule-action-btn" data-rule-type="mock">Mock Response</button>
-              <button class="rule-action-btn" data-rule-type="redirect">Redirect</button>
-              <button class="rule-action-btn" data-rule-type="delay">Add Delay</button>
-              <button class="rule-action-btn" data-rule-type="throttle">Throttle</button>
+              <button class="rule-action-btn" data-rule-type="mock">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/><path d="m5 11 3-3"/></svg>
+                Mock Response
+                <span class="tooltip" data-tooltip="Return mock data for this URL">?</span>
+              </button>
+              <button class="rule-action-btn" data-rule-type="redirect">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Redirect
+                <span class="tooltip" data-tooltip="Forward to another URL">?</span>
+              </button>
+              <button class="rule-action-btn" data-rule-type="delay">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Add Delay
+                <span class="tooltip" data-tooltip="Simulate slow network">?</span>
+              </button>
+              <button class="rule-action-btn" data-rule-type="throttle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m8 17 4 4 4-4"/></svg>
+                Throttle
+                <span class="tooltip" data-tooltip="Limit bandwidth">?</span>
+              </button>
             </div>
             <div class="rules-output">
               <textarea id="rules-output-editor" class="rules-editor"></textarea>
             </div>
             <div class="rules-apply">
-              <button id="apply-rules-btn" class="primary-btn">Apply Rules</button>
-              <button id="clear-rules-btn" class="secondary-btn">Clear Rules</button>
+              <button id="apply-rules-btn" class="btn btn-primary">Apply Rules</button>
+              <button id="clear-rules-btn" class="btn btn-secondary">Clear Rules</button>
             </div>
           </div>
         </div>
@@ -245,8 +277,8 @@
               <span id="response-status" class="response-status"></span>
               <span id="response-time" class="response-time"></span>
               <span id="response-size" class="response-size"></span>
-              <button id="copy-response-btn" class="copy-response-btn" title="Copy Response">📋</button>
-              <button id="mock-this-btn" class="mock-this-btn" title="Create Mock Rule for this URL">🎭 Mock This</button>
+              <button id="copy-response-btn" class="copy-response-btn" title="Copy Response"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>
+              <button id="mock-this-btn" class="mock-this-btn" title="Create Mock Rule for this URL"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/><path d="m5 11 3-3"/></svg> Mock This</button>
             </div>
           </div>
           <div class="response-tabs">
@@ -284,7 +316,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Import Request</h2>
-        <button class="close-modal">×</button>
+        <button class="close-modal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       </div>
       <div class="modal-body">
         <textarea id="import-input" class="import-input" placeholder="Paste cURL, HAR, or raw HTTP request..."></textarea>
@@ -303,7 +335,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Save to Collection</h2>
-        <button class="close-modal">×</button>
+        <button class="close-modal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -324,10 +356,10 @@
         <div class="form-group">
           <div id="save-new-folder-inline" class="new-folder-inline hidden">
             <input id="save-new-folder-input" type="text" class="new-folder-input" placeholder="Folder name">
-            <button id="save-new-folder-confirm" class="new-folder-btn">✓</button>
-            <button id="save-new-folder-cancel" class="new-folder-btn">×</button>
+            <button id="save-new-folder-confirm" class="new-folder-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+            <button id="save-new-folder-cancel" class="new-folder-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
           </div>
-          <button id="new-folder-in-save" class="text-btn">+ New Folder</button>
+          <button id="new-folder-in-save" class="text-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> New Folder</button>
         </div>
       </div>
       <div class="modal-footer">
@@ -340,7 +372,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Settings</h2>
-        <button class="close-modal">×</button>
+        <button class="close-modal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -379,6 +411,8 @@
     </div>
   </div>
 
+  <script src="/ui/js/icons.js"></script>
+  <script src="/ui/js/components.js"></script>
   <script src="/ui/js/sandbox.js"></script>
   <script src="/ui/js/app.js"></script>
 </body>
