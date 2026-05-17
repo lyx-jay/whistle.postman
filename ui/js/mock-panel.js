@@ -62,9 +62,9 @@
         html += '  <span class="mock-type">' + ruleType + '</span>';
         html += '  <span class="mock-status-dot ' + (mock.enabled ? 'active' : 'inactive') + '" title="' + (mock.enabled ? 'Active' : 'Inactive') + '"></span>';
         html += '  <span class="mock-actions">';
-        html += '    <button class="mock-btn toggle" data-id="' + mock.id + '" title="' + (mock.enabled ? 'Disable' : 'Enable') + '">' + (mock.enabled ? '\u26a1' : '\u26a0') + '</button>';
-        html += '    <button class="mock-btn edit" data-id="' + mock.id + '" title="Edit">\u270f\ufe0f</button>';
-        html += '    <button class="mock-btn delete" data-id="' + mock.id + '" title="Delete">\u{1f5d1}\ufe0f</button>';
+        html += '    <button class="mock-btn toggle" data-id="' + mock.id + '" title="' + (mock.enabled ? 'Disable' : 'Enable') + '"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></button>';
+        html += '    <button class="mock-btn edit" data-id="' + mock.id + '" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>';
+        html += '    <button class="mock-btn delete" data-id="' + mock.id + '" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>';
         html += '  </span>';
         html += '</div>';
       });
@@ -154,9 +154,9 @@
               '<div class="mock-edit-label-row">' +
                 '<label>Response Body:</label>' +
                 '<div class="mock-edit-tools">' +
-                  '<button class="mock-tool-btn" id="mock-format-btn" title="Format JSON">{ } Format</button>' +
-                  '<button class="mock-tool-btn" id="mock-search-btn" title="Search (Ctrl+F)">\u{1f50d} Search</button>' +
-                  '<button class="mock-tool-btn" id="mock-replace-btn" title="Replace (Ctrl+H)">\u{1f504} Replace</button>' +
+                  '<button class="mock-tool-btn" id="mock-format-btn" title="Format JSON"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Format</button>' +
+                  '<button class="mock-tool-btn" id="mock-search-btn" title="Search (Ctrl+F)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Search</button>' +
+                  '<button class="mock-tool-btn" id="mock-replace-btn" title="Replace (Ctrl+H)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M10 20H4v-6"/><path d="m21 21-14-14"/></svg> Replace</button>' +
                 '</div>' +
               '</div>' +
               '<div class="mock-edit-editor-wrap">' +
