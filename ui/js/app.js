@@ -918,11 +918,13 @@
 
       renderResponse();
       renderTestResults();
+      checkMockStatus();
     }).catch(function(err) {
       state.response = { error: err.message };
       state.testResults = [];
       renderResponse();
       renderTestResults();
+      checkMockStatus();
     }).finally(function() {
       sendBtn.innerHTML = 'Send';
       sendBtn.classList.remove('loading');
@@ -1139,6 +1141,35 @@
 
   function escapeRegex(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function checkMockStatus() {
+    var req = state.currentRequest;
+    if (!req.url) return;
+
+    var urlPath = req.url.replace(/^https?:\/\/[^\/]+/, '');
+    
+    api('/api/mock-rules').then(function(data) {
+      var mocks = data.data || [];
+      var activeMock = mocks.find(function(m) {
+        return m.enabled && (m.urlPath === urlPath || req.url.includes(m.urlPath));
+      });
+      
+      updateMockIndicator(activeMock);
+    });
+  }
+
+  function updateMockIndicator(mock) {
+    var indicator = document.getElementById('mock-status-indicator');
+    if (!indicator) return;
+
+    if (mock) {
+      indicator.innerHTML = '<span class="mock-active">\uD83C\uDFAD Mocked: ' + escapeHtml(mock.name) + '</span>';
+      indicator.classList.add('has-mock');
+    } else {
+      indicator.innerHTML = '';
+      indicator.classList.remove('has-mock');
+    }
   }
 
   function mockThisUrl() {
@@ -2107,6 +2138,24 @@
     loadEnvironments();
     loadMockTemplates();
     renderCurrentRequest();
+
+    if (typeof MockPanel !== 'undefined') {
+      MockPanel.init();
+    }
+
+    var refreshBtn = document.getElementById('refresh-mocks-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', function() {
+        if (typeof MockPanel !== 'undefined') MockPanel.loadMocks();
+      });
+    }
+
+    var deleteAllBtn = document.getElementById('delete-all-mocks-btn');
+    if (deleteAllBtn) {
+      deleteAllBtn.addEventListener('click', function() {
+        if (typeof MockPanel !== 'undefined') MockPanel.deleteAllMocks();
+      });
+    }
   }
 
   if (document.readyState === 'loading') {

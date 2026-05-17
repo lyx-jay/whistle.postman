@@ -269,10 +269,22 @@
           </div>
         </div>
 
+        <div class="mock-panel-section">
+          <div class="mock-panel-header">
+            <h3>Active Mock Rules</h3>
+            <div class="mock-panel-actions">
+              <button id="refresh-mocks-btn" class="btn btn-ghost btn-sm">Refresh</button>
+              <button id="delete-all-mocks-btn" class="btn btn-danger btn-sm">Delete All</button>
+            </div>
+          </div>
+          <div id="mock-rules-list" class="mock-rules-list"></div>
+        </div>
+
         <div class="response-section">
           <div class="response-resize-handle"></div>
           <div class="response-header">
             <span class="response-title">Response</span>
+            <div id="mock-status-indicator" class="mock-status-indicator"></div>
             <div class="response-meta">
               <span id="response-status" class="response-status"></span>
               <span id="response-time" class="response-time"></span>
@@ -410,6 +422,7 @@
   <script src="/ui/js/icons.js"></script>
   <script src="/ui/js/components.js"></script>
   <script src="/ui/js/sandbox.js"></script>
+  <script src="/ui/js/mock-panel.js"></script>
   <script src="/ui/js/app.js"></script>
 </body>
 </html>

@@ -1775,3 +1775,197 @@ svg {
   fill: none;
   stroke: currentColor;
 }
+
+/* === Mock Panel Styles === */
+.mock-panel-section {
+  border-top: 1px solid var(--color-hairline);
+  background: var(--color-canvas);
+}
+
+.mock-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.mock-panel-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.mock-panel-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-sm {
+  height: 30px;
+  padding: 0 var(--space-3);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-body);
+}
+
+.btn-ghost:hover {
+  background: var(--color-surface-card);
+}
+
+.btn-danger {
+  background: var(--color-canvas);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.btn-danger:hover {
+  background: var(--color-error);
+  color: var(--color-on-primary);
+}
+
+.mock-rules-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.mock-empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.mock-rule-item {
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+}
+
+.mock-rule-item.disabled {
+  opacity: 0.6;
+}
+
+.mock-rule-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.mock-method {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: rgba(93, 184, 166, 0.1);
+  color: var(--color-info);
+  border-radius: var(--radius-sm);
+}
+
+.mock-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.mock-status {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.mock-rule-url {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: var(--space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mock-rule-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mock-toggle-btn,
+.mock-edit-btn,
+.mock-delete-btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: 12px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mock-toggle-btn {
+  background: var(--color-surface-card);
+  color: var(--color-body);
+}
+
+.mock-toggle-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: var(--color-primary);
+}
+
+.mock-edit-btn {
+  background: var(--color-canvas);
+  color: var(--color-body);
+}
+
+.mock-edit-btn:hover {
+  background: var(--color-surface-card);
+}
+
+.mock-delete-btn {
+  background: var(--color-canvas);
+  color: var(--color-error);
+}
+
+.mock-delete-btn:hover {
+  background: var(--color-error);
+  color: var(--color-on-primary);
+  border-color: var(--color-error);
+}
+
+/* Mock Status Indicator */
+.mock-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-right: var(--space-3);
+}
+
+.mock-status-indicator.has-mock {
+  padding: var(--space-1) var(--space-3);
+  background: rgba(204, 120, 92, 0.1);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+}
+
+.mock-active {
+  font-size: 12px;
+  color: var(--color-primary);
+  font-weight: 500;
+}
