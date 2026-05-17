@@ -978,8 +978,8 @@
     $('#response-size').textContent = formatSize(res.size || 0);
 
     renderResponseBody(res.body || '');
-    $('#response-headers').textContent = res.headers ? JSON.stringify(res.headers, null, 2) : '';
-    $('#response-cookies').textContent = res.cookies ? JSON.stringify(res.cookies, null, 2) : '';
+    var headersEl = $('#response-headers');
+    if (headersEl) headersEl.textContent = res.headers ? JSON.stringify(res.headers, null, 2) : '';
     scrollResponseIntoView();
   }
 
